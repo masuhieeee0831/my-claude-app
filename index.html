@@ -1,0 +1,1202 @@
+
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FishingLog Share</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Hiragino Sans', 'Yu Gothic', 'Meiryo', sans-serif; background: #f0f2f5; display: flex; justify-content: center; min-height: 100vh; }
+
+        .app {
+            width: 430px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: #fff;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(0,0,0,0.15);
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1565c0, #1a73e8);
+            color: white;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+            z-index: 200;
+        }
+        .header-title { font-size: 19px; font-weight: 800; letter-spacing: 0.5px; }
+        .header-sub { font-size: 12px; opacity: 0.75; margin-top: 2px; }
+        .header-icon { font-size: 28px; }
+
+        /* Content */
+        .content { flex: 1; overflow: hidden; position: relative; }
+
+        .tab-panel { display: none; height: 100%; overflow-y: auto; overflow-x: hidden; flex-direction: column; }
+        .tab-panel.active { display: flex; }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            display: flex;
+            background: white;
+            border-top: 1px solid #e8e8e8;
+            flex-shrink: 0;
+            z-index: 200;
+        }
+        .nav-btn {
+            flex: 1;
+            padding: 9px 4px 7px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            color: #aaa;
+            font-size: 10px;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+        .nav-btn.active { color: #1a73e8; }
+        .nav-btn svg { width: 22px; height: 22px; }
+
+        /* ===== MAP TAB ===== */
+        #map { width: 100%; height: 100%; }
+        .map-overlay {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 500;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 0 16px;
+        }
+        .checkin-btn {
+            background: linear-gradient(135deg, #1565c0, #1a73e8);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 15px 36px;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(26,115,232,0.5);
+            white-space: nowrap;
+        }
+        .weather-card {
+            background: rgba(255,255,255,0.95);
+            border-radius: 12px;
+            padding: 10px 16px;
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+            color: #555;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+            width: 100%;
+            max-width: 340px;
+        }
+        .weather-item { display: flex; align-items: center; gap: 5px; }
+        .weather-item span:first-child { font-size: 18px; }
+
+        /* ===== TIMELINE TAB ===== */
+        .timeline { padding: 12px; display: flex; flex-direction: column; gap: 14px; }
+        .post-card {
+            background: white;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+        .post-header { display: flex; align-items: center; gap: 10px; padding: 12px 14px; }
+        .avatar {
+            width: 42px; height: 42px; border-radius: 50%;
+            background: linear-gradient(135deg, #e3f2fd, #90caf9);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; flex-shrink: 0;
+        }
+        .post-meta { flex: 1; }
+        .post-username { font-weight: 700; font-size: 14px; color: #222; }
+        .post-time { font-size: 11px; color: #bbb; margin-top: 1px; }
+        .post-privacy { font-size: 10px; color: #1a73e8; background: #e8f0fe; padding: 2px 6px; border-radius: 10px; }
+
+        .post-image {
+            width: 100%; height: 190px;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 50%, #90caf9 100%);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 72px;
+        }
+        .post-body { padding: 12px 14px; }
+        .post-fish { font-size: 17px; font-weight: 800; color: #222; }
+        .post-size { font-size: 13px; color: #1a73e8; font-weight: 700; margin-left: 6px; }
+        .post-detail { font-size: 13px; color: #666; margin-top: 6px; line-height: 1.6; }
+        .post-location { font-size: 12px; color: #1a73e8; margin-top: 8px; font-weight: 600; }
+        .post-actions {
+            display: flex; gap: 0; padding: 0;
+            border-top: 1px solid #f5f5f5;
+        }
+        .action-btn {
+            flex: 1; display: flex; align-items: center; justify-content: center;
+            gap: 5px; border: none; background: none; cursor: pointer;
+            color: #777; font-size: 13px; padding: 10px 0;
+            transition: background 0.15s, color 0.15s;
+        }
+        .action-btn:hover { background: #f8f8f8; }
+        .action-btn.liked { color: #e53935; }
+
+        /* ===== POST TAB ===== */
+        .form-container { padding: 18px; display: flex; flex-direction: column; gap: 16px; }
+        .form-title { font-size: 19px; font-weight: 800; color: #222; }
+        .photo-upload {
+            width: 100%; height: 160px;
+            border: 2px dashed #90caf9;
+            border-radius: 14px;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            gap: 8px; cursor: pointer; color: #1a73e8;
+            background: linear-gradient(135deg, #f0f7ff, #e8f0fe);
+            transition: border-color 0.2s;
+        }
+        .photo-upload:hover { border-color: #1a73e8; }
+        .photo-upload-icon { font-size: 42px; }
+        .photo-upload-text { font-size: 14px; font-weight: 600; }
+
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-label { font-size: 12px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: 0.5px; }
+        .form-input, .form-select {
+            width: 100%; padding: 12px 14px;
+            border: 1.5px solid #e0e0e0; border-radius: 10px;
+            font-size: 14px; outline: none; color: #333;
+            transition: border-color 0.2s;
+            font-family: inherit;
+        }
+        .form-input:focus, .form-select:focus { border-color: #1a73e8; }
+
+        .privacy-row { display: flex; gap: 8px; }
+        .privacy-btn {
+            flex: 1; padding: 10px 6px; border: 1.5px solid #e0e0e0;
+            border-radius: 10px; background: white; cursor: pointer;
+            font-size: 12px; color: #666; text-align: center;
+            transition: all 0.2s; font-family: inherit;
+        }
+        .privacy-btn.selected { border-color: #1a73e8; background: #e8f0fe; color: #1a73e8; font-weight: 700; }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #1565c0, #1a73e8);
+            color: white; border: none; border-radius: 12px;
+            padding: 15px; font-size: 16px; font-weight: 800;
+            cursor: pointer; box-shadow: 0 4px 12px rgba(26,115,232,0.35);
+            font-family: inherit;
+        }
+
+        /* ===== MYPAGE TAB ===== */
+        .mypage { padding: 16px; display: flex; flex-direction: column; gap: 16px; }
+        .profile-card {
+            background: linear-gradient(135deg, #1565c0, #1a73e8, #42a5f5);
+            color: white; border-radius: 18px; padding: 22px;
+            text-align: center;
+        }
+        .profile-avatar {
+            width: 76px; height: 76px; border-radius: 50%;
+            background: rgba(255,255,255,0.25);
+            margin: 0 auto 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 40px; border: 3px solid rgba(255,255,255,0.5);
+        }
+        .profile-name { font-size: 21px; font-weight: 800; }
+        .profile-sub { font-size: 13px; opacity: 0.8; margin-top: 4px; }
+        .profile-tags { display: flex; gap: 8px; justify-content: center; margin-top: 10px; flex-wrap: wrap; }
+        .profile-tag {
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px; padding: 4px 12px; font-size: 12px;
+        }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .stat-card {
+            background: white; border-radius: 12px; padding: 14px 8px;
+            text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+        }
+        .stat-num { font-size: 26px; font-weight: 800; color: #1a73e8; }
+        .stat-label { font-size: 11px; color: #999; margin-top: 3px; font-weight: 600; }
+
+        .section-title { font-size: 15px; font-weight: 800; color: #333; }
+
+        .pref-list {
+            background: white; border-radius: 12px;
+            overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+        }
+        .pref-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 13px 14px; border-bottom: 1px solid #f5f5f5;
+        }
+        .pref-item:last-child { border-bottom: none; }
+        .pref-rank { font-size: 11px; font-weight: 800; color: #bbb; width: 20px; text-align: center; }
+        .pref-name { font-size: 14px; flex: 1; }
+        .pref-bar-wrap { flex: 2; height: 7px; background: #f0f0f0; border-radius: 4px; overflow: hidden; }
+        .pref-bar { height: 100%; background: linear-gradient(90deg, #1565c0, #42a5f5); border-radius: 4px; }
+        .pref-count { font-size: 13px; font-weight: 800; color: #1a73e8; width: 32px; text-align: right; }
+
+        .fish-rank-list {
+            background: white; border-radius: 12px;
+            overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+        }
+        .fish-rank-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 14px; border-bottom: 1px solid #f5f5f5;
+        }
+        .fish-rank-item:last-child { border-bottom: none; }
+        .fish-emoji { font-size: 24px; width: 36px; text-align: center; }
+        .fish-info { flex: 1; }
+        .fish-name { font-size: 14px; font-weight: 700; }
+        .fish-max { font-size: 12px; color: #999; margin-top: 2px; }
+        .fish-count-badge {
+            background: #e8f0fe; color: #1a73e8;
+            border-radius: 20px; padding: 4px 10px; font-size: 12px; font-weight: 700;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 75px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(30,30,30,0.9);
+            color: white; padding: 11px 22px;
+            border-radius: 24px; font-size: 14px;
+            z-index: 9999; opacity: 0;
+            transition: opacity 0.3s;
+            white-space: nowrap;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+            pointer-events: none;
+        }
+        .toast.show { opacity: 1; }
+
+        /* ===== GROUP TAB ===== */
+        .group-list { padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+        .group-card {
+            background: white; border-radius: 14px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            overflow: hidden; cursor: pointer;
+        }
+        .group-card-body { display: flex; align-items: center; gap: 12px; padding: 14px; }
+        .group-icon {
+            width: 50px; height: 50px; border-radius: 14px; flex-shrink: 0;
+            background: linear-gradient(135deg, #e3f2fd, #90caf9);
+            display: flex; align-items: center; justify-content: center; font-size: 26px;
+        }
+        .group-info { flex: 1; }
+        .group-name { font-size: 15px; font-weight: 800; color: #222; }
+        .group-meta { font-size: 12px; color: #999; margin-top: 3px; }
+        .group-code-badge {
+            background: #e8f0fe; color: #1a73e8;
+            border-radius: 8px; padding: 4px 10px; font-size: 12px; font-weight: 700;
+            font-family: monospace;
+        }
+        .group-action-row {
+            display: flex; gap: 10px; padding: 12px 14px 14px;
+        }
+        .group-btn {
+            flex: 1; padding: 12px; border: none; border-radius: 10px;
+            font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit;
+        }
+        .group-btn-primary {
+            background: linear-gradient(135deg, #1565c0, #1a73e8);
+            color: white; box-shadow: 0 3px 10px rgba(26,115,232,0.3);
+        }
+        .group-btn-secondary {
+            background: #f0f2f5; color: #555;
+        }
+        .group-detail { display: flex; flex-direction: column; height: 100%; }
+        .group-detail-header {
+            background: linear-gradient(135deg, #1565c0, #1a73e8);
+            color: white; padding: 14px 16px;
+            display: flex; align-items: center; gap: 12px; flex-shrink: 0;
+        }
+        .group-back-btn {
+            background: none; border: none; color: white;
+            font-size: 22px; cursor: pointer; padding: 0 4px;
+        }
+        .group-detail-title { font-size: 17px; font-weight: 800; }
+        .group-detail-sub { font-size: 12px; opacity: 0.8; margin-top: 2px; }
+        .member-list { background: white; }
+        .member-row {
+            display: flex; align-items: center; gap: 14px;
+            padding: 13px 16px; border-bottom: 1px solid #f5f5f5;
+        }
+        .member-row:last-child { border-bottom: none; }
+        .member-avatar {
+            width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
+            background: linear-gradient(135deg, #e3f2fd, #90caf9);
+            display: flex; align-items: center; justify-content: center; font-size: 22px;
+        }
+        .member-row-name { font-size: 15px; color: #222; font-weight: 500; }
+
+        /* Group/Join Modal */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 9997; padding: 20px;
+        }
+        .modal-dialog {
+            background: white; border-radius: 18px; padding: 24px;
+            width: 100%; max-width: 380px;
+            display: flex; flex-direction: column; gap: 14px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.25);
+        }
+        .modal-dialog h3 { font-size: 17px; font-weight: 800; color: #222; }
+        .modal-dialog p { font-size: 13px; color: #666; line-height: 1.6; }
+        .modal-input {
+            width: 100%; padding: 12px 14px;
+            border: 1.5px solid #e0e0e0; border-radius: 10px;
+            font-size: 15px; outline: none; font-family: inherit;
+        }
+        .modal-input:focus { border-color: #1a73e8; }
+        .modal-btn-primary {
+            padding: 13px; background: linear-gradient(135deg, #1565c0, #1a73e8);
+            color: white; border: none; border-radius: 10px;
+            font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit;
+        }
+        .modal-btn-cancel {
+            padding: 10px; background: none; color: #999; border: none;
+            font-size: 13px; cursor: pointer; font-family: inherit;
+        }
+        .code-display {
+            text-align: center; background: #f0f7ff; border-radius: 12px; padding: 16px;
+        }
+        .code-display .code-num {
+            font-size: 32px; font-weight: 800; color: #1a73e8;
+            letter-spacing: 6px; font-family: monospace;
+        }
+        .code-display p { font-size: 12px; color: #888; margin-top: 6px; }
+
+        /* Fish Entry List */
+        .fish-entry-list { display: flex; flex-direction: column; gap: 8px; }
+        .fish-entry { display: flex; gap: 8px; align-items: center; }
+        .fish-entry .form-input { flex: 1; margin: 0; }
+        .fish-entry-remove {
+            width: 36px; height: 36px; flex-shrink: 0;
+            border: none; background: #fee2e2; color: #ef4444;
+            border-radius: 8px; font-size: 16px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .add-fish-btn {
+            width: 100%; padding: 9px; border: 1.5px dashed #90caf9;
+            border-radius: 10px; background: #f0f7ff; color: #1a73e8;
+            font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit;
+        }
+        .fish-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+        .fish-tag {
+            background: #e8f0fe; color: #1a73e8;
+            border-radius: 20px; padding: 3px 10px; font-size: 13px; font-weight: 600;
+        }
+
+        /* Timeline Filter */
+        .timeline-filter {
+            display: flex; gap: 6px; padding-bottom: 10px;
+        }
+        .tl-filter-btn {
+            padding: 6px 16px; border: 1.5px solid #e0e0e0;
+            border-radius: 20px; background: white; color: #888;
+            font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit;
+            transition: all 0.15s;
+        }
+        .tl-filter-btn.active {
+            background: #1a73e8; border-color: #1a73e8; color: white;
+        }
+
+        /* Scrollbar */
+        .tab-panel::-webkit-scrollbar { width: 4px; }
+        .tab-panel::-webkit-scrollbar-thumb { background: #ddd; border-radius: 2px; }
+
+        /* Photo Grid */
+        .photo-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+        .photo-thumb-wrap { position: relative; width: calc(33.3% - 6px); aspect-ratio: 1; border-radius: 10px; overflow: hidden; }
+        .photo-thumb { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .photo-thumb-remove {
+            position: absolute; top: 4px; right: 4px;
+            background: rgba(0,0,0,0.55); color: white; border: none;
+            border-radius: 50%; width: 22px; height: 22px; font-size: 12px;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+        .photo-add-tile {
+            width: calc(33.3% - 6px); aspect-ratio: 1;
+            border: 2px dashed #90caf9; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: #1a73e8; font-size: 28px; background: #f0f7ff;
+        }
+        .ai-btn {
+            width: 100%; padding: 12px;
+            background: linear-gradient(135deg, #6a1b9a, #ab47bc);
+            color: white; border: none; border-radius: 10px;
+            font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit;
+            box-shadow: 0 3px 10px rgba(106,27,154,0.3);
+        }
+        .ai-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .ai-result-card {
+            background: linear-gradient(135deg, #f3e5f5, #fce4ec);
+            border: 1.5px solid #ce93d8; border-radius: 14px; padding: 14px;
+            display: flex; flex-direction: column; gap: 8px;
+        }
+        .ai-result-title { font-size: 12px; font-weight: 700; color: #6a1b9a; text-transform: uppercase; letter-spacing: 0.5px; }
+        .ai-fish-name { font-size: 20px; font-weight: 800; color: #333; }
+        .ai-fish-detail { font-size: 13px; color: #666; line-height: 1.5; }
+        .ai-apply-btn {
+            padding: 9px; background: #6a1b9a; color: white; border: none;
+            border-radius: 8px; font-size: 13px; font-weight: 700;
+            cursor: pointer; font-family: inherit;
+        }
+        .api-key-modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 9998; padding: 20px;
+        }
+        .api-key-dialog {
+            background: white; border-radius: 18px; padding: 24px;
+            width: 100%; max-width: 380px;
+            display: flex; flex-direction: column; gap: 14px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.25);
+        }
+        .api-key-dialog h3 { font-size: 17px; font-weight: 800; color: #222; }
+        .api-key-dialog p { font-size: 13px; color: #666; line-height: 1.6; }
+        .api-key-input {
+            width: 100%; padding: 12px 14px; border: 1.5px solid #e0e0e0;
+            border-radius: 10px; font-size: 13px; font-family: monospace; outline: none;
+        }
+        .api-key-input:focus { border-color: #6a1b9a; }
+        .api-key-save-btn {
+            padding: 12px; background: linear-gradient(135deg, #6a1b9a, #ab47bc);
+            color: white; border: none; border-radius: 10px;
+            font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit;
+        }
+        .api-key-cancel-btn {
+            padding: 10px; background: none; color: #999; border: none;
+            font-size: 13px; cursor: pointer; font-family: inherit;
+        }
+    </style>
+</head>
+<body>
+<div class="app">
+    <!-- Header -->
+    <div class="header">
+        <div>
+            <div class="header-title">🎣 FishingLog Share</div>
+            <div class="header-sub">仲間と釣果をリアルタイム共有</div>
+        </div>
+        <div class="header-icon">🐟</div>
+    </div>
+
+    <!-- Content Panels -->
+    <div class="content">
+
+        <!-- MAP -->
+        <div class="tab-panel active" id="panel-map">
+            <div id="map"></div>
+            <div class="map-overlay">
+                <div class="weather-card" id="weather-card">
+                    <div class="weather-item"><span>☀️</span><span>晴れ 23℃</span></div>
+                    <div class="weather-item"><span>🌊</span><span>中潮</span></div>
+                    <div class="weather-item"><span>💨</span><span>南西 3m/s</span></div>
+                    <div class="weather-item"><span>📍</span><span>東京湾</span></div>
+                </div>
+                <button class="checkin-btn" onclick="checkin()">📍 ここで釣る！</button>
+            </div>
+        </div>
+
+        <!-- TIMELINE -->
+        <div class="tab-panel" id="panel-timeline">
+            <div style="padding:10px 14px 0; background:white; border-bottom:1px solid #f0f0f0; flex-shrink:0;">
+                <div class="timeline-filter">
+                    <button class="tl-filter-btn active" id="tl-btn-all" onclick="switchTimelineFilter('all', this)">全体</button>
+                    <button class="tl-filter-btn" id="tl-btn-group" onclick="switchTimelineFilter('group', this)">グループ</button>
+                    <button class="tl-filter-btn" id="tl-btn-mine" onclick="switchTimelineFilter('mine', this)">個人</button>
+                </div>
+            </div>
+            <div class="timeline" id="timeline-content"></div>
+        </div>
+
+        <!-- POST -->
+        <div class="tab-panel" id="panel-post">
+            <div class="form-container">
+                <div class="form-title">釣果を投稿 🎣</div>
+
+                <input type="file" id="photo-file-input" accept="image/*" multiple style="display:none" onchange="handlePhotoSelect(this)">
+                <div class="photo-grid" id="photo-grid">
+                    <div class="photo-add-tile" onclick="document.getElementById('photo-file-input').click()">＋</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">魚種</label>
+                    <div class="fish-entry-list" id="fish-entry-list">
+                        <div class="fish-entry">
+                            <input class="form-input" type="text" placeholder="例: シーバス" autocomplete="off" />
+                        </div>
+                    </div>
+                    <button type="button" class="add-fish-btn" onclick="addFishEntry()" style="margin-top:8px;">＋ 魚種を追加</button>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">釣り場</label>
+                    <input class="form-input" type="text" id="location-input" placeholder="例: 東京湾 木更津沖" />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">公開設定</label>
+                    <div class="privacy-row">
+                        <button class="privacy-btn selected" onclick="selectPrivacy(this, 'public')">🌐<br>全体公開</button>
+                        <button class="privacy-btn" onclick="selectPrivacy(this, 'group')">👥<br>グループ</button>
+                        <button class="privacy-btn" onclick="selectPrivacy(this, 'private')">🔒<br>個人</button>
+                    </div>
+                </div>
+
+                <button class="submit-btn" onclick="submitPost()">投稿する 🎣</button>
+            </div>
+        </div>
+
+        <!-- GROUP -->
+        <div class="tab-panel" id="panel-group">
+            <div id="group-list-view">
+                <div class="group-list" id="group-list-content"></div>
+                <div style="padding: 0 14px 14px; display:flex; gap:10px;">
+                    <button class="group-btn group-btn-primary" onclick="showCreateGroupModal()">＋ グループを作成</button>
+                    <button class="group-btn group-btn-secondary" onclick="showJoinGroupModal()">🔑 コードで参加</button>
+                </div>
+            </div>
+            <div id="group-detail-view" style="display:none; flex-direction:column; height:100%;">
+                <div class="group-detail-header">
+                    <button class="group-back-btn" onclick="closeGroupDetail()">‹</button>
+                    <div>
+                        <div class="group-detail-title" id="detail-title"></div>
+                        <div class="group-detail-sub" id="detail-sub"></div>
+                    </div>
+                </div>
+                <div style="flex:1; overflow-y:auto; background:#f0f2f5;">
+                    <div style="padding:14px 16px 8px; font-size:12px; font-weight:700; color:#888;">メンバー <span id="detail-member-count"></span></div>
+                    <div class="member-list" id="detail-members"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MYPAGE -->
+        <div class="tab-panel" id="panel-mypage">
+            <div class="mypage">
+                <div class="profile-card">
+                    <div class="profile-avatar">🧑</div>
+                    <div class="profile-name">あなたのアカウント</div>
+                </div>
+
+                <div class="stats-grid" style="display:none">
+                    <div class="stat-card">
+                        <div class="stat-num" id="stat-trips">47</div>
+                        <div class="stat-label">釣行回数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-num" id="stat-total">183</div>
+                        <div class="stat-label">総釣果数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-num">15</div>
+                        <div class="stat-label">魚種数</div>
+                    </div>
+                </div>
+
+                <div class="section-title">都道府県別 釣行回数</div>
+                <div class="pref-list">
+                    <div class="pref-item">
+                        <span class="pref-rank">1</span>
+                        <span class="pref-name">🗾 神奈川</span>
+                        <div class="pref-bar-wrap"><div class="pref-bar" style="width:100%"></div></div>
+                        <span class="pref-count">18回</span>
+                    </div>
+                    <div class="pref-item">
+                        <span class="pref-rank">2</span>
+                        <span class="pref-name">🗾 千葉</span>
+                        <div class="pref-bar-wrap"><div class="pref-bar" style="width:67%"></div></div>
+                        <span class="pref-count">12回</span>
+                    </div>
+                    <div class="pref-item">
+                        <span class="pref-rank">3</span>
+                        <span class="pref-name">🗾 静岡</span>
+                        <div class="pref-bar-wrap"><div class="pref-bar" style="width:50%"></div></div>
+                        <span class="pref-count">9回</span>
+                    </div>
+                    <div class="pref-item">
+                        <span class="pref-rank">4</span>
+                        <span class="pref-name">🗾 東京</span>
+                        <div class="pref-bar-wrap"><div class="pref-bar" style="width:33%"></div></div>
+                        <span class="pref-count">6回</span>
+                    </div>
+                    <div class="pref-item">
+                        <span class="pref-rank">5</span>
+                        <span class="pref-name">🗾 北海道</span>
+                        <div class="pref-bar-wrap"><div class="pref-bar" style="width:11%"></div></div>
+                        <span class="pref-count">2回</span>
+                    </div>
+                </div>
+
+                <div class="section-title">自分の投稿</div>
+                <div id="my-posts-list"></div>
+            </div>
+        </div>
+
+    </div><!-- /.content -->
+
+    <!-- Bottom Nav -->
+    <div class="bottom-nav">
+        <button class="nav-btn active" id="nav-map" onclick="switchTab('map')">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/></svg>
+            地図
+        </button>
+        <button class="nav-btn" id="nav-timeline" onclick="switchTab('timeline')">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
+            タイムライン
+        </button>
+        <button class="nav-btn" id="nav-post" onclick="switchTab('post')">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
+            投稿
+        </button>
+        <button class="nav-btn" id="nav-group" onclick="switchTab('group')">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+            グループ
+        </button>
+        <button class="nav-btn" id="nav-mypage" onclick="switchTab('mypage')">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            マイページ
+        </button>
+    </div>
+</div>
+
+<!-- Create Group Modal -->
+<div class="modal-overlay" id="create-group-modal" style="display:none">
+    <div class="modal-dialog">
+        <h3>＋ グループを作成</h3>
+        <input class="modal-input" id="new-group-name" placeholder="グループ名を入力" maxlength="20" />
+        <button class="modal-btn-primary" onclick="createGroup()">作成する</button>
+        <button class="modal-btn-cancel" onclick="document.getElementById('create-group-modal').style.display='none'">キャンセル</button>
+    </div>
+</div>
+
+<!-- Created Code Modal -->
+<div class="modal-overlay" id="created-code-modal" style="display:none">
+    <div class="modal-dialog">
+        <h3>🎉 グループを作成しました</h3>
+        <div class="code-display">
+            <div class="code-num" id="created-code-display"></div>
+            <p>このコードを仲間に共有してください</p>
+        </div>
+        <button class="modal-btn-primary" onclick="document.getElementById('created-code-modal').style.display='none'">OK</button>
+    </div>
+</div>
+
+<!-- Join Group Modal -->
+<div class="modal-overlay" id="join-group-modal" style="display:none">
+    <div class="modal-dialog">
+        <h3>🔑 グループに参加</h3>
+        <p>仲間から受け取った参加コードを入力してください。</p>
+        <input class="modal-input" id="join-code-input" placeholder="参加コード" maxlength="6" style="text-align:center; letter-spacing:4px; font-family:monospace;" />
+        <button class="modal-btn-primary" onclick="joinGroup()">参加する</button>
+        <button class="modal-btn-cancel" onclick="document.getElementById('join-group-modal').style.display='none'">キャンセル</button>
+    </div>
+</div>
+
+<div class="api-key-modal" id="api-key-modal" style="display:none">
+    <div class="api-key-dialog">
+        <h3>🔑 Gemini APIキーを設定</h3>
+        <p>AI魚判定機能にはGoogle Gemini APIキーが必要です（<b>無料</b>）。<br><a href="https://aistudio.google.com/apikey" target="_blank" style="color:#6a1b9a">aistudio.google.com</a> で取得できます。キーはこのデバイスにのみ保存されます。</p>
+        <input type="password" class="api-key-input" id="api-key-input" placeholder="AIzaSy..." />
+        <button class="api-key-save-btn" onclick="saveApiKey()">保存して判定する</button>
+        <button class="api-key-cancel-btn" onclick="closeApiKeyModal()">キャンセル</button>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== Mock Data =====
+const FISH_EMOJIS = { マダイ:'🐡', シーバス:'🐟', アジ:'🐠', サバ:'🐟', ブラックバス:'🐟', ヒラメ:'🦈', カサゴ:'🐡', マゴチ:'🐠', サーモン:'🍣', ハマチ:'🐟', その他:'🐟' };
+
+let posts = [
+    { id:1, user:'たろう', emoji:'🧑', fish:['シーバス','アジ'], size:72, lure:'バイブレーション 14g', location:'荒川 岩淵水門', time:'2時間前', lat:35.787, lng:139.742, likes:8, liked:false, comments:3, privacy:'フレンドのみ' },
+    { id:2, user:'さくら', emoji:'👩', fish:['アジ'], size:28, lure:'サビキ仕掛け', location:'横浜 本牧埠頭', time:'5時間前', lat:35.430, lng:139.654, likes:14, liked:false, comments:5, privacy:'全体公開' },
+    { id:3, user:'けんじ', emoji:'👨', fish:['マダイ','ヒラメ'], size:58, lure:'タイラバ', location:'東京湾 中ノ瀬', time:'昨日', lat:35.520, lng:139.780, likes:21, liked:false, comments:7, privacy:'フレンドのみ' },
+    { id:4, user:'みほ', emoji:'👩', fish:['ヒラメ'], size:45, lure:'ワーム 4インチ', location:'九十九里浜', time:'2日前', lat:35.580, lng:140.520, likes:16, liked:false, comments:4, privacy:'フレンドのみ' },
+    { id:5, user:'ゆうき', emoji:'🧒', fish:['ブラックバス'], size:38, lure:'トップウォーター', location:'霞ヶ浦 石岡エリア', time:'3日前', lat:36.193, lng:140.267, likes:9, liked:false, comments:2, privacy:'全体公開' },
+    { id:6, user:'りょう', emoji:'🧔', fish:['サーモン'], size:64, lure:'スプーン 20g', location:'支笏湖 早来', time:'4日前', lat:42.765, lng:141.363, likes:33, liked:false, comments:11, privacy:'全体公開' },
+];
+
+let selectedPrivacy = 'public';
+let map, myMarker, postMarkers = [];
+
+// ===== Map Setup =====
+window.addEventListener('load', () => {
+    map = L.map('map').setView([36.5, 137.5], 6);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a>'
+    }).addTo(map);
+
+    renderMapPins();
+
+    renderTimeline();
+    renderGroups();
+    renderMyPosts();
+});
+
+function renderMyPosts() {
+    const myPosts = posts.filter(p => p.user === 'あなた');
+    const container = document.getElementById('my-posts-list');
+    if (!myPosts.length) {
+        container.innerHTML = '<div style="text-align:center; color:#bbb; padding:30px 0; font-size:14px;">まだ投稿がありません</div>';
+        return;
+    }
+    container.innerHTML = `<div class="timeline" style="padding-top:0">` + myPosts.map(post => `
+        <div class="post-card">
+            <div class="post-header">
+                <div class="avatar">${post.emoji}</div>
+                <div class="post-meta">
+                    <div class="post-username">${post.user}</div>
+                    <div class="post-time">${post.time}</div>
+                </div>
+                <span class="post-privacy">${post.privacy === '全体公開' ? '🌐' : post.privacy === 'フレンドのみ' ? '👥' : '🔒'} ${post.privacy}</span>
+            </div>
+            <div class="post-image">${FISH_EMOJIS[post.fish[0]] || '🐟'}</div>
+            <div class="post-body">
+                <div class="fish-tags">${post.fish.map(f => `<span class="fish-tag">🎣 ${f}</span>`).join('')}</div>
+                <div class="post-location">📍 ${post.location}</div>
+            </div>
+        </div>`).join('') + `</div>`;
+}
+
+function renderMapPins() {
+    postMarkers.forEach(m => map.removeLayer(m));
+    postMarkers = [];
+    const seen = new Set();
+    posts.forEach(post => {
+        if (seen.has(post.location)) return;
+        seen.add(post.location);
+        const fishEmoji = FISH_EMOJIS[post.fish[0]] || '🐟';
+        const icon = L.divIcon({
+            className: '',
+            html: `<div style="
+                background:white; border:2px solid #1a73e8;
+                border-radius:50%; width:38px; height:38px;
+                display:flex; align-items:center; justify-content:center;
+                font-size:20px; box-shadow:0 2px 8px rgba(0,0,0,0.25);
+                cursor:pointer;
+            ">${fishEmoji}</div>`,
+            iconAnchor: [19, 19]
+        });
+        const marker = L.marker([post.lat, post.lng], { icon }).addTo(map);
+        marker.bindPopup(`
+            <div style="font-family:sans-serif; min-width:150px;">
+                ${fishEmoji} <b>${post.fish.join(' · ')}</b><br>
+                📍 ${post.location}<br>
+                <span style="color:#999; font-size:11px;">${post.user} · ${post.time}</span>
+            </div>
+        `);
+        postMarkers.push(marker);
+    });
+}
+
+function addMapPin(post) {
+    renderMapPins();
+}
+
+// ===== Timeline Render =====
+let currentTimelineFilter = 'all';
+
+function switchTimelineFilter(filter, btn) {
+    currentTimelineFilter = filter;
+    document.querySelectorAll('.tl-filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderTimeline();
+}
+
+function getFilteredPosts() {
+    if (currentTimelineFilter === 'mine') {
+        return posts.filter(p => p.user === 'あなた');
+    }
+    if (currentTimelineFilter === 'group') {
+        const groupMemberNames = new Set(groups.flatMap(g => g.members.map(m => m.name)));
+        return posts.filter(p => groupMemberNames.has(p.user));
+    }
+    return posts;
+}
+
+function renderTimeline() {
+    const container = document.getElementById('timeline-content');
+    const filtered = getFilteredPosts();
+    if (!filtered.length) {
+        container.innerHTML = '<div style="text-align:center; color:#bbb; padding:50px 0; font-size:14px;">投稿がありません</div>';
+        return;
+    }
+    container.innerHTML = filtered.map(post => `
+        <div class="post-card" id="post-${post.id}">
+            <div class="post-header">
+                <div class="avatar">${post.emoji}</div>
+                <div class="post-meta">
+                    <div class="post-username">${post.user}</div>
+                    <div class="post-time">${post.time}</div>
+                </div>
+                <span class="post-privacy">${post.privacy === '全体公開' ? '🌐' : post.privacy === 'フレンドのみ' ? '👥' : '🔒'} ${post.privacy}</span>
+            </div>
+            <div class="post-image">${FISH_EMOJIS[post.fish[0]] || '🐟'}</div>
+            <div class="post-body">
+                <div class="fish-tags">${post.fish.map(f => `<span class="fish-tag">🎣 ${f}</span>`).join('')}</div>
+                <div class="post-location">📍 ${post.location}</div>
+            </div>
+            <div class="post-actions">
+                <button class="action-btn ${post.liked ? 'liked' : ''}" onclick="toggleLike(${post.id}, this)">
+                    ${post.liked ? '❤️' : '🤍'} <span>${post.likes}</span>
+                </button>
+                <button class="action-btn" onclick="showToast('💬 コメント機能（デモ）')">
+                    💬 <span>${post.comments}</span>
+                </button>
+                <button class="action-btn" onclick="showOnMap(${post.lat}, ${post.lng})">
+                    🗺️ 地図で見る
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// ===== Interactions =====
+function toggleLike(id, btn) {
+    const post = posts.find(p => p.id === id);
+    if (!post) return;
+    post.liked = !post.liked;
+    post.likes += post.liked ? 1 : -1;
+    btn.classList.toggle('liked', post.liked);
+    btn.querySelector('span').textContent = post.likes;
+    btn.firstChild.textContent = post.liked ? '❤️ ' : '🤍 ';
+}
+
+function showOnMap(lat, lng) {
+    switchTab('map');
+    setTimeout(() => {
+        map.setView([lat, lng], 13);
+    }, 150);
+}
+
+function checkin() {
+    placeMyPin(35.658, 139.701);
+}
+
+function placeMyPin(lat, lng) {
+    if (myMarker) map.removeLayer(myMarker);
+    const icon = L.divIcon({
+        className: '',
+        html: `<div style="
+            background:#1a73e8; color:white;
+            border-radius:50%; width:40px; height:40px;
+            display:flex; align-items:center; justify-content:center;
+            font-size:20px; box-shadow:0 3px 12px rgba(26,115,232,0.6);
+            border:3px solid white;
+        ">📍</div>`,
+        iconAnchor: [20, 20]
+    });
+    myMarker = L.marker([lat, lng], { icon }).addTo(map);
+    myMarker.bindPopup('<b>あなたのチェックイン地点</b><br>☀️ 晴れ 23℃ / 🌊 中潮 / 💨 南西 3m/s').openPopup();
+    map.setView([lat, lng], 13);
+    showToast('✅ チェックイン完了！ ☀️ 晴れ 🌊 中潮');
+}
+
+function selectPrivacy(btn, val) {
+    document.querySelectorAll('.privacy-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    selectedPrivacy = val;
+}
+
+function addFishEntry() {
+    const list = document.getElementById('fish-entry-list');
+    const entry = document.createElement('div');
+    entry.className = 'fish-entry';
+    entry.innerHTML = `<input class="form-input" type="text" placeholder="例: アジ" autocomplete="off" />
+        <button type="button" class="fish-entry-remove" onclick="this.parentElement.remove()">✕</button>`;
+    list.appendChild(entry);
+}
+
+function getFishList() {
+    return Array.from(document.querySelectorAll('#fish-entry-list input'))
+        .map(i => i.value.trim()).filter(v => v);
+}
+
+function submitPost() {
+    const fish = getFishList();
+    const location = document.getElementById('location-input').value;
+
+    if (!fish.length) { showToast('⚠️ 魚種を入力してください'); return; }
+    if (!location) { showToast('⚠️ 釣り場を入力してください'); return; }
+
+    const lat = 35.5 + (Math.random() - 0.5) * 4;
+    const lng = 137.0 + (Math.random() - 0.5) * 6;
+
+    const privacyLabel = selectedPrivacy === 'public' ? '全体公開' : selectedPrivacy === 'group' ? 'グループ' : '個人';
+    const newPost = {
+        id: Date.now(),
+        user: 'あなた', emoji: '🧑',
+        fish, size: null, lure: null,
+        location,
+        time: 'たった今',
+        lat, lng,
+        likes: 0, liked: false, comments: 0,
+        privacy: privacyLabel
+    };
+    posts.unshift(newPost);
+    addMapPin(newPost);
+    renderTimeline();
+
+    // Update stats
+    const totalEl = document.getElementById('stat-total');
+    totalEl.textContent = parseInt(totalEl.textContent) + 1;
+
+    // Reset form
+    document.getElementById('fish-type').value = '';
+    document.getElementById('location-input').value = '';
+    selectedPhotos = [];
+    renderPhotoGrid();
+
+    renderMyPosts();
+    showToast('🎉 投稿しました！');
+    switchTab('timeline');
+}
+
+
+
+// ===== Tab Switch =====
+function switchTab(tab) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('panel-' + tab).classList.add('active');
+    document.getElementById('nav-' + tab).classList.add('active');
+    if (tab === 'map') setTimeout(() => map.invalidateSize(), 100);
+}
+
+// ===== Groups =====
+let groups = [
+    { id:1, name:'東京湾アングラーズ', emoji:'🎣', code:'TKY001', members:[{name:'たろう',emoji:'🧑'},{name:'さくら',emoji:'👩'},{name:'けんじ',emoji:'👨'},{name:'あなた',emoji:'🧑'}], postIds:[1,2,3] },
+    { id:2, name:'霞ヶ浦バス釣り部', emoji:'🐟', code:'KSM002', members:[{name:'ゆうき',emoji:'🧒'},{name:'りょう',emoji:'🧔'},{name:'あなた',emoji:'🧑'}], postIds:[5,6] },
+];
+
+function renderGroups() {
+    const container = document.getElementById('group-list-content');
+    container.innerHTML = groups.map(g => `
+        <div class="group-card" onclick="openGroupDetail(${g.id})">
+            <div class="group-card-body">
+                <div class="group-icon">${g.emoji}</div>
+                <div class="group-info">
+                    <div class="group-name">${g.name}</div>
+                    <div class="group-meta">👥 ${g.members.length}人</div>
+                </div>
+                <div class="group-code-badge">${g.code}</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function openGroupDetail(id) {
+    const g = groups.find(g => g.id === id);
+    if (!g) return;
+    document.getElementById('detail-title').textContent = `${g.emoji} ${g.name}`;
+    document.getElementById('detail-sub').textContent = `参加コード: ${g.code}　👥 ${g.members.length}人`;
+    document.getElementById('detail-member-count').textContent = g.members.length + '人';
+    document.getElementById('detail-members').innerHTML = g.members.map(m =>
+        `<div class="member-row">
+            <div class="member-avatar">${m.emoji}</div>
+            <div class="member-row-name">${m.name}</div>
+        </div>`
+    ).join('');
+    document.getElementById('group-list-view').style.display = 'none';
+    const dv = document.getElementById('group-detail-view');
+    dv.style.display = 'flex';
+}
+
+function closeGroupDetail() {
+    document.getElementById('group-detail-view').style.display = 'none';
+    document.getElementById('group-list-view').style.display = 'block';
+}
+
+function showCreateGroupModal() {
+    document.getElementById('new-group-name').value = '';
+    document.getElementById('create-group-modal').style.display = 'flex';
+}
+
+function createGroup() {
+    const name = document.getElementById('new-group-name').value.trim();
+    if (!name) { showToast('⚠️ グループ名を入力してください'); return; }
+    const code = Math.random().toString(36).substring(2,8).toUpperCase();
+    const newGroup = { id: Date.now(), name, emoji:'🎣', code, members:[{name:'あなた',emoji:'🧑'}], postIds:[] };
+    groups.unshift(newGroup);
+    renderGroups();
+    document.getElementById('create-group-modal').style.display = 'none';
+    document.getElementById('created-code-display').textContent = code;
+    document.getElementById('created-code-modal').style.display = 'flex';
+}
+
+function showJoinGroupModal() {
+    document.getElementById('join-code-input').value = '';
+    document.getElementById('join-group-modal').style.display = 'flex';
+}
+
+function joinGroup() {
+    const code = document.getElementById('join-code-input').value.trim().toUpperCase();
+    if (!code) { showToast('⚠️ コードを入力してください'); return; }
+    const existing = groups.find(g => g.code === code);
+    if (existing) {
+        const alreadyIn = existing.members.some(m => m.name === 'あなた');
+        if (alreadyIn) { showToast('すでに参加しています'); }
+        else { existing.members.push({name:'あなた',emoji:'🧑'}); renderGroups(); showToast(`✅「${existing.name}」に参加しました`); }
+    } else {
+        showToast('⚠️ グループが見つかりません');
+    }
+    document.getElementById('join-group-modal').style.display = 'none';
+}
+
+// ===== AI Fish Identification =====
+let selectedPhotos = [];
+
+function handlePhotoSelect(input) {
+    const files = Array.from(input.files);
+    if (!files.length) return;
+    files.forEach(file => {
+        if (selectedPhotos.length >= 9) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            selectedPhotos.push({ src: e.target.result });
+            renderPhotoGrid();
+        };
+        reader.readAsDataURL(file);
+    });
+    input.value = '';
+}
+
+function renderPhotoGrid() {
+    const grid = document.getElementById('photo-grid');
+    grid.innerHTML = selectedPhotos.map((p, i) => `
+        <div class="photo-thumb-wrap">
+            <img class="photo-thumb" src="${p.src}">
+            <button class="photo-thumb-remove" onclick="removePhoto(${i})">✕</button>
+        </div>
+    `).join('');
+    if (selectedPhotos.length < 9) {
+        grid.innerHTML += `<div class="photo-add-tile" onclick="document.getElementById('photo-file-input').click()">＋</div>`;
+    }
+}
+
+function removePhoto(index) {
+    selectedPhotos.splice(index, 1);
+    renderPhotoGrid();
+}
+
+async function identifyFishFromPhoto() {
+    const apiKey = localStorage.getItem('gemini_api_key');
+    if (!apiKey) { showApiKeyModal(); return; }
+
+    const btn = document.getElementById('ai-identify-btn');
+    btn.disabled = true;
+    btn.textContent = '🔍 判定中...';
+
+    try {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [
+                        { inline_data: { mime_type: selectedPhotoMime, data: selectedPhotoBase64 } },
+                        { text: '写真の魚を特定してください。必ずJSON形式のみで回答（余分なテキスト不要）：{"fish":"魚種名（日本語）","size":"推定サイズ（例：30〜40cm）","confidence":"高/中/低","feature":"特徴（20字以内）"}' }
+                    ]
+                }]
+            })
+        });
+
+        if (!res.ok) {
+            const err = await res.json();
+            if (res.status === 400 || res.status === 401 || res.status === 403) {
+                localStorage.removeItem('gemini_api_key');
+                btn.disabled = false;
+                btn.textContent = '🤖 AI魚判定する';
+                showApiKeyModal();
+                return;
+            }
+            throw new Error(err.error?.message || 'APIエラー');
+        }
+
+        const data = await res.json();
+        const match = data.candidates[0].content.parts[0].text.match(/\{[\s\S]*\}/);
+        if (!match) throw new Error('レスポンス解析エラー');
+        aiResultData = JSON.parse(match[0]);
+
+        document.getElementById('ai-fish-name').textContent = `🐟 ${aiResultData.fish}（信頼度: ${aiResultData.confidence}）`;
+        document.getElementById('ai-fish-detail').textContent = `📏 ${aiResultData.size} ／ ${aiResultData.feature}`;
+        document.getElementById('ai-result-card').style.display = 'flex';
+
+    } catch (e) {
+        showToast('⚠️ ' + e.message);
+        console.error('AI判定エラー:', e);
+    }
+
+    btn.disabled = false;
+    btn.textContent = '🤖 AI魚判定する';
+}
+
+function applyAiResult() {
+    if (!aiResultData) return;
+    const select = document.getElementById('fish-type');
+    const fishName = aiResultData.fish;
+    let matched = false;
+    for (let opt of select.options) {
+        if (opt.value === fishName || fishName.includes(opt.value) || opt.value.includes(fishName)) {
+            select.value = opt.value;
+            matched = true;
+            break;
+        }
+    }
+    if (!matched) {
+        const opt = new Option(fishName, fishName);
+        select.add(opt);
+        select.value = fishName;
+    }
+    showToast(`✅ 魚種を「${fishName}」に設定しました`);
+}
+
+// ===== API Key Modal =====
+function showApiKeyModal() {
+    document.getElementById('api-key-modal').style.display = 'flex';
+    document.getElementById('api-key-input').value = localStorage.getItem('gemini_api_key') || '';
+}
+
+function closeApiKeyModal() {
+    document.getElementById('api-key-modal').style.display = 'none';
+}
+
+function saveApiKey() {
+    const key = document.getElementById('api-key-input').value.trim();
+    if (!key) { showToast('⚠️ APIキーを入力してください'); return; }
+    localStorage.setItem('gemini_api_key', key);
+    closeApiKeyModal();
+    if (selectedPhotoBase64) identifyFishFromPhoto();
+}
+
+// ===== Toast =====
+let toastTimer;
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>
