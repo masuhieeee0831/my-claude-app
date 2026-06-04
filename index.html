@@ -100,15 +100,24 @@
         .weather-card {
             background: rgba(255,255,255,0.95);
             border-radius: 12px;
-            padding: 10px 16px;
+            padding: 10px 14px;
             display: flex;
-            gap: 16px;
+            flex-direction: column;
+            gap: 7px;
             font-size: 12px;
             color: #555;
             box-shadow: 0 2px 10px rgba(0,0,0,0.12);
             width: 100%;
             max-width: 340px;
         }
+        .weather-date-row {
+            display: flex; align-items: center; gap: 6px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid rgba(0,0,0,0.07);
+            color: #1a73e8; font-size: 13px; font-weight: 700;
+        }
+        .weather-date-row span:first-child { font-size: 15px; }
+        .weather-items-row { display: flex; gap: 12px; flex-wrap: wrap; }
         .weather-item { display: flex; align-items: center; gap: 5px; }
         .weather-item span:first-child { font-size: 18px; }
 
@@ -199,6 +208,17 @@
             padding: 15px; font-size: 16px; font-weight: 800;
             cursor: pointer; box-shadow: 0 4px 12px rgba(26,115,232,0.35);
             font-family: inherit;
+        }
+        .cancel-edit-btn {
+            background: #f0f2f5; color: #555; border: none; border-radius: 12px;
+            padding: 13px; font-size: 15px; font-weight: 700;
+            cursor: pointer; font-family: inherit;
+        }
+        .edit-mode-badge {
+            display: inline-block; background: #fff3e0; color: #e65100;
+            border-radius: 8px; padding: 3px 10px;
+            font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
+            margin-left: 8px; vertical-align: middle;
         }
 
         /* ===== MYPAGE TAB ===== */
@@ -328,6 +348,16 @@
             background: none; border: none; color: white;
             font-size: 22px; cursor: pointer; padding: 0 4px;
         }
+        .group-edit-header-btn {
+            margin-left: auto; flex-shrink: 0;
+            background: rgba(255,255,255,0.2);
+            border: 1.5px solid rgba(255,255,255,0.5);
+            color: white; border-radius: 20px;
+            padding: 6px 12px; font-size: 12px; font-weight: 700;
+            cursor: pointer; font-family: inherit;
+            transition: background 0.2s;
+        }
+        .group-edit-header-btn:hover { background: rgba(255,255,255,0.32); }
         .group-detail-title { font-size: 17px; font-weight: 800; }
         .group-detail-sub { font-size: 12px; opacity: 0.8; margin-top: 2px; }
         .member-list { background: white; }
@@ -484,6 +514,70 @@
             padding: 10px; background: none; color: #999; border: none;
             font-size: 13px; cursor: pointer; font-family: inherit;
         }
+
+        /* ===== PROFILE EDIT ===== */
+        .profile-edit-btn {
+            margin-top: 14px;
+            padding: 8px 20px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1.5px solid rgba(255,255,255,0.5);
+            border-radius: 20px;
+            font-size: 13px; font-weight: 700;
+            cursor: pointer; font-family: inherit;
+            transition: background 0.2s;
+        }
+        .profile-edit-btn:hover { background: rgba(255,255,255,0.32); }
+        .emoji-picker-grid {
+            display: flex; flex-wrap: wrap; gap: 8px;
+            padding: 10px; background: #f8f9fa;
+            border-radius: 10px; border: 1.5px solid #e0e0e0;
+        }
+        .emoji-opt {
+            width: 42px; height: 42px; font-size: 24px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 8px; cursor: pointer;
+            border: 2px solid transparent;
+            transition: border-color 0.15s, background 0.15s;
+        }
+        .emoji-opt:hover { background: #e8f0fe; }
+        .emoji-opt.selected { border-color: #1a73e8; background: #e8f0fe; }
+
+        /* ===== LOCATION MINI MAP ===== */
+        .location-row { display: flex; gap: 8px; }
+        .location-row .form-input { flex: 1; min-width: 0; }
+        .location-search-btn {
+            padding: 12px 12px; border: 1.5px solid #1a73e8;
+            border-radius: 10px; background: #e8f0fe; color: #1a73e8;
+            font-size: 13px; font-weight: 700; cursor: pointer;
+            font-family: inherit; white-space: nowrap; flex-shrink: 0;
+        }
+        .post-map-preview {
+            width: 100%; height: 180px;
+            border-radius: 12px; overflow: hidden;
+            border: 1.5px solid #e0e0e0; margin-top: 8px;
+        }
+        .post-location-status {
+            font-size: 12px; margin-top: 4px; line-height: 1.4;
+        }
+
+        /* ===== PROFILE PHOTO ===== */
+        .profile-photo-area {
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+            padding: 14px; background: #f8f9fa; border-radius: 12px;
+            border: 1.5px dashed #90caf9; cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .profile-photo-area:hover { border-color: #1a73e8; }
+        .profile-photo-preview {
+            width: 72px; height: 72px; border-radius: 50%; overflow: hidden;
+            background: linear-gradient(135deg, #e3f2fd, #90caf9);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 38px; border: 2px solid rgba(26,115,232,0.2);
+            flex-shrink: 0;
+        }
+        .profile-photo-preview img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
+        .profile-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
     </style>
 </head>
 <body>
@@ -491,10 +585,9 @@
     <!-- Header -->
     <div class="header">
         <div>
-            <div class="header-title">🎣 FishingLog Share</div>
+            <div class="header-title">FishingLog Share</div>
             <div class="header-sub">仲間と釣果をリアルタイム共有</div>
         </div>
-        <div class="header-icon">🐟</div>
     </div>
 
     <!-- Content Panels -->
@@ -506,10 +599,15 @@
             <div class="map-overlay">
                 <button class="checkin-btn" onclick="checkin()">📍 ここで釣る！</button>
                 <div class="weather-card" id="weather-card">
-                    <div class="weather-item"><span>☀️</span><span>晴れ 23℃</span></div>
-                    <div class="weather-item"><span>🌊</span><span>中潮</span></div>
-                    <div class="weather-item"><span>💨</span><span>南西 3m/s</span></div>
-                    <div class="weather-item"><span>📍</span><span>東京湾</span></div>
+                    <div class="weather-date-row">
+                        <span>📅</span><span id="weather-date">--</span>
+                    </div>
+                    <div class="weather-items-row">
+                        <div class="weather-item"><span>☀️</span><span>晴れ 23℃</span></div>
+                        <div class="weather-item"><span>🌊</span><span>中潮</span></div>
+                        <div class="weather-item"><span>💨</span><span>南西 3m/s</span></div>
+                        <div class="weather-item"><span>📍</span><span>東京湾</span></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -529,7 +627,7 @@
         <!-- POST -->
         <div class="tab-panel" id="panel-post">
             <div class="form-container">
-                <div class="form-title">釣果を投稿 🎣</div>
+                <div class="form-title" id="post-form-title">釣果を投稿 🎣</div>
 
                 <input type="file" id="photo-file-input" accept="image/*" multiple style="display:none" onchange="handlePhotoSelect(this)">
                 <div class="photo-grid" id="photo-grid">
@@ -548,7 +646,12 @@
 
                 <div class="form-group">
                     <label class="form-label">釣り場</label>
-                    <input class="form-input" type="text" id="location-input" placeholder="例: 東京湾 木更津沖" />
+                    <div class="location-row">
+                        <input class="form-input" type="text" id="location-input" placeholder="例: 東京湾 木更津沖" />
+                        <button type="button" class="location-search-btn" onclick="searchPostLocation()">🔍 地図確認</button>
+                    </div>
+                    <div id="post-map-preview" class="post-map-preview" style="display:none;"></div>
+                    <div id="post-location-status" class="post-location-status" style="display:none;"></div>
                 </div>
 
                 <div class="form-group">
@@ -560,7 +663,8 @@
                     </div>
                 </div>
 
-                <button class="submit-btn" onclick="submitPost()">投稿する 🎣</button>
+                <button class="submit-btn" id="post-submit-btn" onclick="submitPost()">投稿する 🎣</button>
+                <button class="cancel-edit-btn" id="post-cancel-edit-btn" onclick="cancelEditPost()" style="display:none;">キャンセル</button>
             </div>
         </div>
 
@@ -576,10 +680,11 @@
             <div id="group-detail-view" style="display:none; flex-direction:column; height:100%;">
                 <div class="group-detail-header">
                     <button class="group-back-btn" onclick="closeGroupDetail()">‹</button>
-                    <div>
+                    <div style="flex:1;">
                         <div class="group-detail-title" id="detail-title"></div>
                         <div class="group-detail-sub" id="detail-sub"></div>
                     </div>
+                    <button class="group-edit-header-btn" onclick="showEditGroupModal()">⚙️ 編集</button>
                 </div>
                 <div style="flex:1; overflow-y:auto; background:#f0f2f5;">
                     <div style="padding:14px 16px 8px; font-size:12px; font-weight:700; color:#888;">メンバー <span id="detail-member-count"></span></div>
@@ -592,58 +697,28 @@
         <div class="tab-panel" id="panel-mypage">
             <div class="mypage">
                 <div class="profile-card">
-                    <div class="profile-avatar">🧑</div>
-                    <div class="profile-name">あなたのアカウント</div>
+                    <div class="profile-avatar" id="profile-avatar-display">🧑</div>
+                    <div class="profile-name" id="profile-name-display">あなたのアカウント</div>
+                    <button class="profile-edit-btn" onclick="showProfileEditModal()">⚙️ プロフィール編集</button>
                 </div>
 
-                <div class="stats-grid" style="display:none">
+                <div class="stats-grid">
                     <div class="stat-card">
-                        <div class="stat-num" id="stat-trips">47</div>
+                        <div class="stat-num" id="stat-trips">0</div>
                         <div class="stat-label">釣行回数</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-num" id="stat-total">183</div>
+                        <div class="stat-num" id="stat-total">0</div>
                         <div class="stat-label">総釣果数</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-num">15</div>
+                        <div class="stat-num" id="stat-species">0</div>
                         <div class="stat-label">魚種数</div>
                     </div>
                 </div>
 
-                <div class="section-title">都道府県別 釣行回数</div>
-                <div class="pref-list">
-                    <div class="pref-item">
-                        <span class="pref-rank">1</span>
-                        <span class="pref-name">🗾 神奈川</span>
-                        <div class="pref-bar-wrap"><div class="pref-bar" style="width:100%"></div></div>
-                        <span class="pref-count">18回</span>
-                    </div>
-                    <div class="pref-item">
-                        <span class="pref-rank">2</span>
-                        <span class="pref-name">🗾 千葉</span>
-                        <div class="pref-bar-wrap"><div class="pref-bar" style="width:67%"></div></div>
-                        <span class="pref-count">12回</span>
-                    </div>
-                    <div class="pref-item">
-                        <span class="pref-rank">3</span>
-                        <span class="pref-name">🗾 静岡</span>
-                        <div class="pref-bar-wrap"><div class="pref-bar" style="width:50%"></div></div>
-                        <span class="pref-count">9回</span>
-                    </div>
-                    <div class="pref-item">
-                        <span class="pref-rank">4</span>
-                        <span class="pref-name">🗾 東京</span>
-                        <div class="pref-bar-wrap"><div class="pref-bar" style="width:33%"></div></div>
-                        <span class="pref-count">6回</span>
-                    </div>
-                    <div class="pref-item">
-                        <span class="pref-rank">5</span>
-                        <span class="pref-name">🗾 北海道</span>
-                        <div class="pref-bar-wrap"><div class="pref-bar" style="width:11%"></div></div>
-                        <span class="pref-count">2回</span>
-                    </div>
-                </div>
+                <div class="section-title">釣り場別 釣行回数</div>
+                <div class="pref-list" id="pref-list"></div>
 
                 <div class="section-title">自分の投稿</div>
                 <div id="my-posts-list"></div>
@@ -677,11 +752,45 @@
     </div>
 </div>
 
+<!-- Profile Edit Modal -->
+<div class="modal-overlay" id="profile-edit-modal" style="display:none">
+    <div class="modal-dialog">
+        <h3>✏️ プロフィール編集</h3>
+        <div style="display:flex; flex-direction:column; gap:6px;">
+            <label class="form-label" style="font-size:11px; font-weight:700; color:#555; text-transform:uppercase; letter-spacing:0.5px;">ユーザー名</label>
+            <input class="modal-input" id="profile-name-input" maxlength="20" placeholder="ユーザー名を入力" />
+        </div>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+            <label class="form-label" style="font-size:11px; font-weight:700; color:#555; text-transform:uppercase; letter-spacing:0.5px;">プロフィール写真</label>
+            <input type="file" id="profile-photo-input" accept="image/*" style="display:none" onchange="handleProfilePhotoSelect(this)">
+            <div class="profile-photo-area" onclick="document.getElementById('profile-photo-input').click()">
+                <div class="profile-photo-preview" id="profile-photo-preview"></div>
+                <span style="font-size:12px; color:#1a73e8; font-weight:600;">タップして写真を選ぶ</span>
+                <span style="font-size:11px; color:#999;">（未設定の場合は絵文字を使用）</span>
+            </div>
+            <button type="button" id="profile-photo-clear-btn" onclick="clearProfilePhoto()" style="display:none; padding:6px; background:none; border:none; color:#ef4444; font-size:12px; cursor:pointer; font-family:inherit; text-align:center;">✕ 写真を削除して絵文字に戻す</button>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+            <label class="form-label" style="font-size:11px; font-weight:700; color:#555; text-transform:uppercase; letter-spacing:0.5px;">アバター絵文字（写真未設定時）</label>
+            <div class="emoji-picker-grid" id="emoji-picker-grid"></div>
+        </div>
+        <button class="modal-btn-primary" onclick="saveProfile()">保存する</button>
+        <button class="modal-btn-cancel" onclick="closeProfileEditModal()">キャンセル</button>
+    </div>
+</div>
+
 <!-- Create Group Modal -->
 <div class="modal-overlay" id="create-group-modal" style="display:none">
     <div class="modal-dialog">
         <h3>＋ グループを作成</h3>
-        <input class="modal-input" id="new-group-name" placeholder="グループ名を入力" maxlength="20" />
+        <div style="display:flex; flex-direction:column; gap:6px;">
+            <label class="form-label" style="font-size:11px; font-weight:700; color:#555; text-transform:uppercase; letter-spacing:0.5px;">グループ名</label>
+            <input class="modal-input" id="new-group-name" placeholder="グループ名を入力" maxlength="20" />
+        </div>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+            <label class="form-label" style="font-size:11px; font-weight:700; color:#555; text-transform:uppercase; letter-spacing:0.5px;">アイコン</label>
+            <div class="emoji-picker-grid" id="create-group-emoji-grid"></div>
+        </div>
         <button class="modal-btn-primary" onclick="createGroup()">作成する</button>
         <button class="modal-btn-cancel" onclick="document.getElementById('create-group-modal').style.display='none'">キャンセル</button>
     </div>
@@ -696,6 +805,23 @@
             <p>このコードを仲間に共有してください</p>
         </div>
         <button class="modal-btn-primary" onclick="document.getElementById('created-code-modal').style.display='none'">OK</button>
+    </div>
+</div>
+
+<!-- Edit Group Modal -->
+<div class="modal-overlay" id="edit-group-modal" style="display:none">
+    <div class="modal-dialog">
+        <h3>⚙️ グループを編集</h3>
+        <div style="display:flex; flex-direction:column; gap:6px;">
+            <label class="form-label" style="font-size:11px; font-weight:700; color:#555; text-transform:uppercase; letter-spacing:0.5px;">グループ名</label>
+            <input class="modal-input" id="edit-group-name" placeholder="グループ名を入力" maxlength="20" />
+        </div>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+            <label class="form-label" style="font-size:11px; font-weight:700; color:#555; text-transform:uppercase; letter-spacing:0.5px;">アイコン</label>
+            <div class="emoji-picker-grid" id="edit-group-emoji-grid"></div>
+        </div>
+        <button class="modal-btn-primary" onclick="saveGroupEdit()">保存する</button>
+        <button class="modal-btn-cancel" onclick="document.getElementById('edit-group-modal').style.display='none'">キャンセル</button>
     </div>
 </div>
 
@@ -723,17 +849,23 @@
 <div class="toast" id="toast"></div>
 
 <script>
+// ===== Date =====
+const _now = new Date();
+const _DAYS = ['日','月','火','水','木','金','土'];
+const todayDateStr = `${_now.getMonth()+1}/${_now.getDate()}(${_DAYS[_now.getDay()]})`;
+
+// ===== Profile =====
+const AVATAR_EMOJIS = ['🧑','👩','👨','🧒','🧔','👴','👵','🎣','🐟','🐠','🐡','🦈','⛵','🏄','🌊','🏕️'];
+let myProfile = JSON.parse(localStorage.getItem('fishinglog_profile')) || { name: 'あなた', emoji: '🧑', photo: null };
+let selectedAvatarEmoji = myProfile.emoji;
+
 // ===== Mock Data =====
 const FISH_EMOJIS = { マダイ:'🐡', シーバス:'🐟', アジ:'🐠', サバ:'🐟', ブラックバス:'🐟', ヒラメ:'🦈', カサゴ:'🐡', マゴチ:'🐠', サーモン:'🍣', ハマチ:'🐟', その他:'🐟' };
 
-let posts = [
-    { id:1, user:'たろう', emoji:'🧑', fish:['シーバス','アジ'], size:72, lure:'バイブレーション 14g', location:'荒川 岩淵水門', time:'2時間前', lat:35.787, lng:139.742, likes:8, liked:false, comments:3, privacy:'フレンドのみ' },
-    { id:2, user:'さくら', emoji:'👩', fish:['アジ'], size:28, lure:'サビキ仕掛け', location:'横浜 本牧埠頭', time:'5時間前', lat:35.430, lng:139.654, likes:14, liked:false, comments:5, privacy:'全体公開' },
-    { id:3, user:'けんじ', emoji:'👨', fish:['マダイ','ヒラメ'], size:58, lure:'タイラバ', location:'東京湾 中ノ瀬', time:'昨日', lat:35.520, lng:139.780, likes:21, liked:false, comments:7, privacy:'フレンドのみ' },
-    { id:4, user:'みほ', emoji:'👩', fish:['ヒラメ'], size:45, lure:'ワーム 4インチ', location:'九十九里浜', time:'2日前', lat:35.580, lng:140.520, likes:16, liked:false, comments:4, privacy:'フレンドのみ' },
-    { id:5, user:'ゆうき', emoji:'🧒', fish:['ブラックバス'], size:38, lure:'トップウォーター', location:'霞ヶ浦 石岡エリア', time:'3日前', lat:36.193, lng:140.267, likes:9, liked:false, comments:2, privacy:'全体公開' },
-    { id:6, user:'りょう', emoji:'🧔', fish:['サーモン'], size:64, lure:'スプーン 20g', location:'支笏湖 早来', time:'4日前', lat:42.765, lng:141.363, likes:33, liked:false, comments:11, privacy:'全体公開' },
-];
+let posts = JSON.parse(localStorage.getItem('fishinglog_posts')) || [];
+
+function savePosts() { localStorage.setItem('fishinglog_posts', JSON.stringify(posts)); }
+function saveGroups() { localStorage.setItem('fishinglog_groups', JSON.stringify(groups)); }
 
 let selectedPrivacy = 'public';
 let map, myMarker, postMarkers = [];
@@ -745,15 +877,23 @@ window.addEventListener('load', () => {
         attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a>'
     }).addTo(map);
 
-    renderMapPins();
+    // Sync group member data to current profile
+    groups.forEach(g => g.members.forEach(m => {
+        if (m.isMe) { m.name = myProfile.name; m.emoji = myProfile.emoji; }
+    }));
 
+    document.getElementById('weather-date').textContent = todayDateStr;
+    renderProfileCard();
+    renderMapPins();
     renderTimeline();
     renderGroups();
     renderMyPosts();
+    updateStats();
+    renderPrefList();
 });
 
 function renderMyPosts() {
-    const myPosts = posts.filter(p => p.user === 'あなた');
+    const myPosts = posts.filter(p => p.isMyPost);
     const container = document.getElementById('my-posts-list');
     if (!myPosts.length) {
         container.innerHTML = '<div style="text-align:center; color:#bbb; padding:30px 0; font-size:14px;">まだ投稿がありません</div>';
@@ -762,17 +902,21 @@ function renderMyPosts() {
     container.innerHTML = `<div class="timeline" style="padding-top:0">` + myPosts.map(post => `
         <div class="post-card">
             <div class="post-header">
-                <div class="avatar">${post.emoji}</div>
+                <div class="avatar">${getAvatarHtml(post)}</div>
                 <div class="post-meta">
                     <div class="post-username">${post.user}</div>
                     <div class="post-time">${post.time}</div>
                 </div>
                 <span class="post-privacy">${post.privacy === '全体公開' ? '🌐' : post.privacy === 'フレンドのみ' ? '👥' : '🔒'} ${post.privacy}</span>
             </div>
-            <div class="post-image">${FISH_EMOJIS[post.fish[0]] || '🐟'}</div>
+            <div class="post-image">${post.photos && post.photos.length ? `<img src="${post.photos[0].src}" style="width:100%;height:190px;object-fit:cover;display:block;">` : (FISH_EMOJIS[post.fish[0]] || '🐟')}</div>
             <div class="post-body">
                 <div class="fish-tags">${post.fish.map(f => `<span class="fish-tag">🎣 ${f}</span>`).join('')}</div>
                 <div class="post-location">📍 ${post.location}</div>
+            </div>
+            <div class="post-actions">
+                <button class="action-btn" onclick="startEditPost(${post.id},'mypage')" style="color:#1a73e8; font-weight:700;">✏️ 編集</button>
+                <button class="action-btn" onclick="showOnMap(${post.lat}, ${post.lng})">🗺️ 地図で見る</button>
             </div>
         </div>`).join('') + `</div>`;
 }
@@ -796,11 +940,15 @@ function renderMapPins() {
             iconAnchor: [10, 10]
         });
         const marker = L.marker([post.lat, post.lng], { icon }).addTo(map);
+        const editBtnHtml = post.isMyPost
+            ? `<div style="margin-top:8px;"><button onclick="startEditPost(${post.id},'map')" style="background:#e8f0fe;color:#1a73e8;border:none;border-radius:8px;padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer;width:100%;font-family:sans-serif;">この投稿を編集する 📝</button></div>`
+            : '';
         marker.bindPopup(`
-            <div style="font-family:sans-serif; min-width:150px;">
+            <div style="font-family:sans-serif; min-width:160px;">
                 ${fishEmoji} <b>${post.fish.join(' · ')}</b><br>
                 📍 ${post.location}<br>
                 <span style="color:#999; font-size:11px;">${post.user} · ${post.time}</span>
+                ${editBtnHtml}
             </div>
         `);
         postMarkers.push(marker);
@@ -823,7 +971,7 @@ function switchTimelineFilter(filter, btn) {
 
 function getFilteredPosts() {
     if (currentTimelineFilter === 'mine') {
-        return posts.filter(p => p.user === 'あなた');
+        return posts.filter(p => p.isMyPost);
     }
     if (currentTimelineFilter === 'group') {
         const groupMemberNames = new Set(groups.flatMap(g => g.members.map(m => m.name)));
@@ -842,14 +990,14 @@ function renderTimeline() {
     container.innerHTML = filtered.map(post => `
         <div class="post-card" id="post-${post.id}">
             <div class="post-header">
-                <div class="avatar">${post.emoji}</div>
+                <div class="avatar">${getAvatarHtml(post)}</div>
                 <div class="post-meta">
                     <div class="post-username">${post.user}</div>
                     <div class="post-time">${post.time}</div>
                 </div>
                 <span class="post-privacy">${post.privacy === '全体公開' ? '🌐' : post.privacy === 'フレンドのみ' ? '👥' : '🔒'} ${post.privacy}</span>
             </div>
-            <div class="post-image">${FISH_EMOJIS[post.fish[0]] || '🐟'}</div>
+            <div class="post-image">${post.photos && post.photos.length ? `<img src="${post.photos[0].src}" style="width:100%;height:190px;object-fit:cover;display:block;">` : (FISH_EMOJIS[post.fish[0]] || '🐟')}</div>
             <div class="post-body">
                 <div class="fish-tags">${post.fish.map(f => `<span class="fish-tag">🎣 ${f}</span>`).join('')}</div>
                 <div class="post-location">📍 ${post.location}</div>
@@ -864,6 +1012,7 @@ function renderTimeline() {
                 <button class="action-btn" onclick="showOnMap(${post.lat}, ${post.lng})">
                     🗺️ 地図で見る
                 </button>
+                ${post.isMyPost ? `<button class="action-btn" onclick="startEditPost(${post.id},'timeline')" style="color:#1a73e8; font-weight:700;">✏️ 編集</button>` : ''}
             </div>
         </div>
     `).join('');
@@ -905,9 +1054,9 @@ function placeMyPin(lat, lng) {
         iconAnchor: [20, 20]
     });
     myMarker = L.marker([lat, lng], { icon }).addTo(map);
-    myMarker.bindPopup('<b>あなたのチェックイン地点</b><br>☀️ 晴れ 23℃ / 🌊 中潮 / 💨 南西 3m/s').openPopup();
+    myMarker.bindPopup(`<b>あなたのチェックイン地点</b><br>📅 ${todayDateStr}<br>☀️ 晴れ 23℃ / 🌊 中潮 / 💨 南西 3m/s`).openPopup();
     map.setView([lat, lng], 13);
-    showToast('✅ チェックイン完了！ ☀️ 晴れ 🌊 中潮');
+    showToast(`✅ チェックイン完了！ 📅 ${todayDateStr} ☀️ 晴れ 🌊 中潮`);
 }
 
 function selectPrivacy(btn, val) {
@@ -930,47 +1079,173 @@ function getFishList() {
         .map(i => i.value.trim()).filter(v => v);
 }
 
-function submitPost() {
+async function submitPost() {
     const fish = getFishList();
-    const location = document.getElementById('location-input').value;
+    const location = document.getElementById('location-input').value.trim();
 
     if (!fish.length) { showToast('⚠️ 魚種を入力してください'); return; }
     if (!location) { showToast('⚠️ 釣り場を入力してください'); return; }
 
-    const lat = 35.5 + (Math.random() - 0.5) * 4;
-    const lng = 137.0 + (Math.random() - 0.5) * 6;
+    const photos = [...selectedPhotos];
+    const isEdit = editingPostId !== null;
+
+    let lat, lng;
+    if (postMapLat !== null && postMapLng !== null) {
+        lat = postMapLat;
+        lng = postMapLng;
+    } else {
+        const submitBtn = document.getElementById('post-submit-btn');
+        submitBtn.disabled = true;
+        submitBtn.textContent = '📍 位置を取得中...';
+        try {
+            const res = await fetch(
+                `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}&countrycodes=jp&limit=1`,
+                { headers: { 'Accept-Language': 'ja' } }
+            );
+            const data = await res.json();
+            if (data.length > 0) {
+                lat = parseFloat(data[0].lat);
+                lng = parseFloat(data[0].lon);
+            } else {
+                showToast('⚠️ 場所が見つかりませんでした。地図上に概算で表示します');
+                lat = 35.5 + (Math.random() - 0.5) * 4;
+                lng = 137.0 + (Math.random() - 0.5) * 6;
+            }
+        } catch (e) {
+            lat = 35.5 + (Math.random() - 0.5) * 4;
+            lng = 137.0 + (Math.random() - 0.5) * 6;
+        }
+        submitBtn.disabled = false;
+        submitBtn.textContent = isEdit ? '変更を保存する 💾' : '投稿する 🎣';
+    }
 
     const privacyLabel = selectedPrivacy === 'public' ? '全体公開' : selectedPrivacy === 'group' ? 'グループ' : '個人';
-    const newPost = {
-        id: Date.now(),
-        user: 'あなた', emoji: '🧑',
-        fish, size: null, lure: null,
-        location,
-        time: 'たった今',
-        lat, lng,
-        likes: 0, liked: false, comments: 0,
-        privacy: privacyLabel
-    };
-    posts.unshift(newPost);
-    addMapPin(newPost);
-    renderTimeline();
 
-    // Update stats
-    const totalEl = document.getElementById('stat-total');
-    totalEl.textContent = parseInt(totalEl.textContent) + 1;
+    if (isEdit) {
+        const post = posts.find(p => p.id === editingPostId);
+        if (post) {
+            post.fish = fish;
+            post.location = location;
+            post.photos = photos;
+            post.privacy = privacyLabel;
+            post.lat = lat;
+            post.lng = lng;
+        }
+        savePosts();
+        const returnTab = editReturnTab;
+        resetPostForm();
+        renderMapPins();
+        renderTimeline();
+        renderMyPosts();
+        updateStats();
+        renderPrefList();
+        showToast('✅ 投稿を更新しました');
+        switchTab(returnTab);
+    } else {
+        const newPost = {
+            id: Date.now(),
+            user: myProfile.name, emoji: myProfile.emoji,
+            fish, size: null, lure: null,
+            location,
+            photos,
+            isMyPost: true,
+            time: 'たった今',
+            lat, lng,
+            likes: 0, liked: false, comments: 0,
+            privacy: privacyLabel
+        };
+        posts.unshift(newPost);
+        savePosts();
+        renderMapPins();
+        renderTimeline();
+        updateStats();
+        renderPrefList();
+        resetPostForm();
+        renderMyPosts();
+        showToast('🎉 投稿しました！');
+        switchTab('timeline');
+    }
+}
 
-    // Reset form
-    document.getElementById('fish-type').value = '';
+
+
+// ===== Post Edit =====
+let editingPostId = null;
+let editReturnTab = 'timeline';
+
+function startEditPost(id, returnTab) {
+    const post = posts.find(p => p.id === id);
+    if (!post) return;
+
+    editingPostId = id;
+    editReturnTab = returnTab || 'timeline';
+
+    document.getElementById('post-form-title').innerHTML = '投稿を編集 <span class="edit-mode-badge">EDIT</span>';
+    document.getElementById('post-submit-btn').textContent = '変更を保存する 💾';
+    document.getElementById('post-cancel-edit-btn').style.display = 'block';
+
+    // 写真を読み込む
+    selectedPhotos = post.photos ? [...post.photos] : [];
+    renderPhotoGrid();
+
+    // 魚種リストを読み込む
+    document.getElementById('fish-entry-list').innerHTML = post.fish.map((f, i) => `
+        <div class="fish-entry">
+            <input class="form-input" type="text" value="${f.replace(/"/g, '&quot;')}" autocomplete="off" />
+            ${i > 0 ? `<button type="button" class="fish-entry-remove" onclick="this.parentElement.remove()">✕</button>` : ''}
+        </div>
+    `).join('');
+
+    // 釣り場を読み込む
+    document.getElementById('location-input').value = post.location;
+
+    // 公開設定を読み込む
+    const privMap = { '全体公開': 0, 'グループ': 1, '個人': 2 };
+    const privVals = ['public', 'group', 'private'];
+    const privIdx = privMap[post.privacy] ?? 0;
+    document.querySelectorAll('.privacy-btn').forEach((b, i) => b.classList.toggle('selected', i === privIdx));
+    selectedPrivacy = privVals[privIdx];
+
+    // 保存済み位置をミニマップに表示
+    postMapLat = post.lat;
+    postMapLng = post.lng;
+    const statusEl = document.getElementById('post-location-status');
+    statusEl.style.display = 'block';
+    statusEl.style.color = '#1a73e8';
+    statusEl.textContent = '📍 保存済みの位置を表示中。ドラッグまたは「🔍 地図確認」で再調整できます';
+    initOrUpdatePostMap(post.lat, post.lng);
+
+    switchTab('post');
+}
+
+function cancelEditPost() {
+    const returnTab = editReturnTab;
+    resetPostForm();
+    switchTab(returnTab);
+}
+
+function resetPostForm() {
+    editingPostId = null;
+    editReturnTab = 'timeline';
+
+    document.getElementById('post-form-title').textContent = '釣果を投稿 🎣';
+    document.getElementById('post-submit-btn').textContent = '投稿する 🎣';
+    document.getElementById('post-cancel-edit-btn').style.display = 'none';
+
+    document.getElementById('fish-entry-list').innerHTML =
+        '<div class="fish-entry"><input class="form-input" type="text" placeholder="例: シーバス" autocomplete="off" /></div>';
     document.getElementById('location-input').value = '';
     selectedPhotos = [];
     renderPhotoGrid();
 
-    renderMyPosts();
-    showToast('🎉 投稿しました！');
-    switchTab('timeline');
+    document.querySelectorAll('.privacy-btn').forEach((b, i) => b.classList.toggle('selected', i === 0));
+    selectedPrivacy = 'public';
+
+    postMapLat = null; postMapLng = null;
+    if (postMap) { postMap.remove(); postMap = null; postMapMarker = null; }
+    document.getElementById('post-map-preview').style.display = 'none';
+    document.getElementById('post-location-status').style.display = 'none';
 }
-
-
 
 // ===== Tab Switch =====
 function switchTab(tab) {
@@ -982,10 +1257,12 @@ function switchTab(tab) {
 }
 
 // ===== Groups =====
-let groups = [
-    { id:1, name:'東京湾アングラーズ', emoji:'🎣', code:'TKY001', members:[{name:'たろう',emoji:'🧑'},{name:'さくら',emoji:'👩'},{name:'けんじ',emoji:'👨'},{name:'あなた',emoji:'🧑'}], postIds:[1,2,3] },
-    { id:2, name:'霞ヶ浦バス釣り部', emoji:'🐟', code:'KSM002', members:[{name:'ゆうき',emoji:'🧒'},{name:'りょう',emoji:'🧔'},{name:'あなた',emoji:'🧑'}], postIds:[5,6] },
-];
+const GROUP_EMOJIS = ['🎣','🐟','🦑','🐙','🚣','🏄','⛵','🐠','🦈','🌊','🐡','🏕️'];
+let selectedCreateGroupEmoji = '🎣';
+let selectedEditGroupEmoji = '🎣';
+let currentDetailGroupId = null;
+
+let groups = JSON.parse(localStorage.getItem('fishinglog_groups')) || [];
 
 function renderGroups() {
     const container = document.getElementById('group-list-content');
@@ -1004,6 +1281,7 @@ function renderGroups() {
 }
 
 function openGroupDetail(id) {
+    currentDetailGroupId = id;
     const g = groups.find(g => g.id === id);
     if (!g) return;
     document.getElementById('detail-title').textContent = `${g.emoji} ${g.name}`;
@@ -1027,6 +1305,10 @@ function closeGroupDetail() {
 
 function showCreateGroupModal() {
     document.getElementById('new-group-name').value = '';
+    selectedCreateGroupEmoji = '🎣';
+    document.getElementById('create-group-emoji-grid').innerHTML = GROUP_EMOJIS.map(e =>
+        `<div class="emoji-opt ${e === selectedCreateGroupEmoji ? 'selected' : ''}" onclick="pickCreateGroupEmoji('${e}',this)">${e}</div>`
+    ).join('');
     document.getElementById('create-group-modal').style.display = 'flex';
 }
 
@@ -1034,8 +1316,9 @@ function createGroup() {
     const name = document.getElementById('new-group-name').value.trim();
     if (!name) { showToast('⚠️ グループ名を入力してください'); return; }
     const code = Math.random().toString(36).substring(2,8).toUpperCase();
-    const newGroup = { id: Date.now(), name, emoji:'🎣', code, members:[{name:'あなた',emoji:'🧑'}], postIds:[] };
+    const newGroup = { id: Date.now(), name, emoji: selectedCreateGroupEmoji, code, members:[{name:myProfile.name,emoji:myProfile.emoji,isMe:true}], postIds:[] };
     groups.unshift(newGroup);
+    saveGroups();
     renderGroups();
     document.getElementById('create-group-modal').style.display = 'none';
     document.getElementById('created-code-display').textContent = code;
@@ -1052,13 +1335,271 @@ function joinGroup() {
     if (!code) { showToast('⚠️ コードを入力してください'); return; }
     const existing = groups.find(g => g.code === code);
     if (existing) {
-        const alreadyIn = existing.members.some(m => m.name === 'あなた');
+        const alreadyIn = existing.members.some(m => m.isMe);
         if (alreadyIn) { showToast('すでに参加しています'); }
-        else { existing.members.push({name:'あなた',emoji:'🧑'}); renderGroups(); showToast(`✅「${existing.name}」に参加しました`); }
+        else { existing.members.push({name:myProfile.name,emoji:myProfile.emoji,isMe:true}); saveGroups(); renderGroups(); showToast(`✅「${existing.name}」に参加しました`); }
     } else {
         showToast('⚠️ グループが見つかりません');
     }
     document.getElementById('join-group-modal').style.display = 'none';
+}
+
+function pickCreateGroupEmoji(emoji, el) {
+    selectedCreateGroupEmoji = emoji;
+    document.querySelectorAll('#create-group-emoji-grid .emoji-opt').forEach(e => e.classList.remove('selected'));
+    el.classList.add('selected');
+}
+
+function showEditGroupModal() {
+    const g = groups.find(g => g.id === currentDetailGroupId);
+    if (!g) return;
+    document.getElementById('edit-group-name').value = g.name;
+    selectedEditGroupEmoji = g.emoji;
+    document.getElementById('edit-group-emoji-grid').innerHTML = GROUP_EMOJIS.map(e =>
+        `<div class="emoji-opt ${e === selectedEditGroupEmoji ? 'selected' : ''}" onclick="pickEditGroupEmoji('${e}',this)">${e}</div>`
+    ).join('');
+    document.getElementById('edit-group-modal').style.display = 'flex';
+}
+
+function pickEditGroupEmoji(emoji, el) {
+    selectedEditGroupEmoji = emoji;
+    document.querySelectorAll('#edit-group-emoji-grid .emoji-opt').forEach(e => e.classList.remove('selected'));
+    el.classList.add('selected');
+}
+
+function saveGroupEdit() {
+    const name = document.getElementById('edit-group-name').value.trim();
+    if (!name) { showToast('⚠️ グループ名を入力してください'); return; }
+    const g = groups.find(g => g.id === currentDetailGroupId);
+    if (!g) return;
+    g.name = name;
+    g.emoji = selectedEditGroupEmoji;
+    saveGroups();
+    renderGroups();
+    document.getElementById('detail-title').textContent = `${g.emoji} ${g.name}`;
+    document.getElementById('detail-sub').textContent = `参加コード: ${g.code}　👥 ${g.members.length}人`;
+    document.getElementById('edit-group-modal').style.display = 'none';
+    showToast('✅ グループを更新しました');
+}
+
+// ===== Profile Edit =====
+function renderProfileCard() {
+    const avatarEl = document.getElementById('profile-avatar-display');
+    avatarEl.innerHTML = myProfile.photo
+        ? `<img src="${myProfile.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
+        : myProfile.emoji;
+    document.getElementById('profile-name-display').textContent = myProfile.name;
+}
+
+function getAvatarHtml(post) {
+    if (post.isMyPost && myProfile.photo) {
+        return `<img src="${myProfile.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+    }
+    return post.emoji;
+}
+
+function showProfileEditModal() {
+    document.getElementById('profile-name-input').value = myProfile.name;
+    selectedAvatarEmoji = myProfile.emoji;
+    pendingProfilePhoto = null;
+
+    const preview = document.getElementById('profile-photo-preview');
+    if (myProfile.photo) {
+        preview.innerHTML = `<img src="${myProfile.photo}">`;
+        document.getElementById('profile-photo-clear-btn').style.display = 'block';
+    } else {
+        preview.textContent = myProfile.emoji;
+        document.getElementById('profile-photo-clear-btn').style.display = 'none';
+    }
+
+    const grid = document.getElementById('emoji-picker-grid');
+    grid.innerHTML = AVATAR_EMOJIS.map(e => `
+        <div class="emoji-opt ${e === selectedAvatarEmoji ? 'selected' : ''}" onclick="pickEmoji('${e}', this)">${e}</div>
+    `).join('');
+    document.getElementById('profile-edit-modal').style.display = 'flex';
+}
+
+function pickEmoji(emoji, el) {
+    selectedAvatarEmoji = emoji;
+    document.querySelectorAll('#emoji-picker-grid .emoji-opt').forEach(e => e.classList.remove('selected'));
+    el.classList.add('selected');
+}
+
+function closeProfileEditModal() {
+    document.getElementById('profile-edit-modal').style.display = 'none';
+}
+
+function saveProfile() {
+    const name = document.getElementById('profile-name-input').value.trim();
+    if (!name) { showToast('⚠️ ユーザー名を入力してください'); return; }
+
+    const newPhoto = pendingProfilePhoto !== null
+        ? (pendingProfilePhoto === '' ? null : pendingProfilePhoto)
+        : myProfile.photo;
+    myProfile = { name, emoji: selectedAvatarEmoji, photo: newPhoto };
+    localStorage.setItem('fishinglog_profile', JSON.stringify(myProfile));
+
+    // 既存の自分の投稿を一括更新
+    posts.forEach(p => {
+        if (p.isMyPost) { p.user = name; p.emoji = selectedAvatarEmoji; }
+    });
+    savePosts();
+
+    // グループメンバーを一括更新
+    groups.forEach(g => g.members.forEach(m => {
+        if (m.isMe) { m.name = name; m.emoji = selectedAvatarEmoji; }
+    }));
+    saveGroups();
+
+    renderProfileCard();
+    renderTimeline();
+    renderMyPosts();
+    renderGroups();
+    closeProfileEditModal();
+    showToast('✅ プロフィールを更新しました');
+}
+
+// ===== Stats & Pref List =====
+function updateStats() {
+    const myPosts = posts.filter(p => p.isMyPost);
+    const totalFish = myPosts.reduce((sum, p) => sum + p.fish.length, 0);
+    const uniqueSpecies = new Set(myPosts.flatMap(p => p.fish)).size;
+    document.getElementById('stat-trips').textContent = myPosts.length;
+    document.getElementById('stat-total').textContent = totalFish;
+    document.getElementById('stat-species').textContent = uniqueSpecies;
+}
+
+function renderPrefList() {
+    const myPosts = posts.filter(p => p.isMyPost);
+    const container = document.getElementById('pref-list');
+    if (!myPosts.length) {
+        container.innerHTML = '<div style="padding:20px; text-align:center; color:#bbb; font-size:13px;">まだ釣行データがありません</div>';
+        return;
+    }
+    const countMap = {};
+    myPosts.forEach(p => { countMap[p.location] = (countMap[p.location] || 0) + 1; });
+    const sorted = Object.entries(countMap).sort((a, b) => b[1] - a[1]).slice(0, 5);
+    const max = sorted[0][1];
+    container.innerHTML = sorted.map(([loc, count], i) => `
+        <div class="pref-item">
+            <span class="pref-rank">${i + 1}</span>
+            <span class="pref-name" style="font-size:13px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">📍 ${loc}</span>
+            <div class="pref-bar-wrap"><div class="pref-bar" style="width:${Math.round(count / max * 100)}%"></div></div>
+            <span class="pref-count">${count}回</span>
+        </div>
+    `).join('');
+}
+
+// ===== Post Location Mini-Map =====
+let postMap = null, postMapMarker = null;
+let postMapLat = null, postMapLng = null;
+
+async function searchPostLocation() {
+    const location = document.getElementById('location-input').value.trim();
+    if (!location) { showToast('⚠️ 釣り場を入力してください'); return; }
+
+    const statusEl = document.getElementById('post-location-status');
+    statusEl.style.display = 'block';
+    statusEl.style.color = '#999';
+    statusEl.textContent = '📍 位置を検索中...';
+
+    let lat, lng;
+    try {
+        const res = await fetch(
+            `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}&countrycodes=jp&limit=1`,
+            { headers: { 'Accept-Language': 'ja' } }
+        );
+        const data = await res.json();
+        if (data.length > 0) {
+            lat = parseFloat(data[0].lat);
+            lng = parseFloat(data[0].lon);
+            statusEl.textContent = '✅ 見つかりました。ピンをドラッグして微調整できます';
+            statusEl.style.color = '#1a73e8';
+        } else {
+            lat = 35.658; lng = 139.701;
+            statusEl.textContent = '⚠️ 見つかりませんでした。地図をタップして位置を指定してください';
+            statusEl.style.color = '#f59e0b';
+        }
+    } catch (e) {
+        lat = 35.658; lng = 139.701;
+        statusEl.textContent = '⚠️ 検索エラー。地図をタップして位置を指定してください';
+        statusEl.style.color = '#ef4444';
+    }
+
+    postMapLat = lat;
+    postMapLng = lng;
+    initOrUpdatePostMap(lat, lng);
+}
+
+function initOrUpdatePostMap(lat, lng) {
+    document.getElementById('post-map-preview').style.display = 'block';
+
+    if (!postMap) {
+        setTimeout(() => {
+            postMap = L.map('post-map-preview').setView([lat, lng], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap'
+            }).addTo(postMap);
+            postMapMarker = L.marker([lat, lng], { draggable: true }).addTo(postMap);
+            postMapMarker.on('dragend', e => {
+                const pos = e.target.getLatLng();
+                postMapLat = pos.lat;
+                postMapLng = pos.lng;
+            });
+            postMap.on('click', e => {
+                postMapLat = e.latlng.lat;
+                postMapLng = e.latlng.lng;
+                postMapMarker.setLatLng([postMapLat, postMapLng]);
+            });
+        }, 50);
+    } else {
+        postMap.setView([lat, lng], 13);
+        postMapMarker.setLatLng([lat, lng]);
+        setTimeout(() => postMap.invalidateSize(), 50);
+    }
+}
+
+// ===== Profile Photo =====
+let pendingProfilePhoto = null;
+
+async function handleProfilePhotoSelect(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+        const resized = await resizeImage(e.target.result, 240);
+        pendingProfilePhoto = resized;
+        const preview = document.getElementById('profile-photo-preview');
+        preview.innerHTML = `<img src="${resized}">`;
+        document.getElementById('profile-photo-clear-btn').style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+    input.value = '';
+}
+
+function clearProfilePhoto() {
+    pendingProfilePhoto = '';
+    const preview = document.getElementById('profile-photo-preview');
+    preview.textContent = myProfile.emoji;
+    document.getElementById('profile-photo-clear-btn').style.display = 'none';
+}
+
+function resizeImage(dataUrl, maxPx) {
+    return new Promise(resolve => {
+        const img = new Image();
+        img.onload = () => {
+            let w = img.width, h = img.height;
+            if (w > maxPx || h > maxPx) {
+                if (w > h) { h = Math.round(h * maxPx / w); w = maxPx; }
+                else { w = Math.round(w * maxPx / h); h = maxPx; }
+            }
+            const c = document.createElement('canvas');
+            c.width = w; c.height = h;
+            c.getContext('2d').drawImage(img, 0, 0, w, h);
+            resolve(c.toDataURL('image/jpeg', 0.82));
+        };
+        img.src = dataUrl;
+    });
 }
 
 // ===== AI Fish Identification =====
