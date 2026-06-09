@@ -402,6 +402,11 @@
             padding: 10px; background: none; color: #999; border: none;
             font-size: 13px; cursor: pointer; font-family: inherit;
         }
+        .modal-btn-danger {
+            padding: 13px; background: linear-gradient(135deg, #c62828, #ef5350);
+            color: white; border: none; border-radius: 10px;
+            font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit;
+        }
         .code-display {
             text-align: center; background: #f0f7ff; border-radius: 12px; padding: 16px;
         }
@@ -578,6 +583,98 @@
         }
         .profile-photo-preview img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
         .profile-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
+
+        /* ===== AUTH OVERLAY ===== */
+        .auth-overlay {
+            position: fixed; inset: 0;
+            background: linear-gradient(160deg, #0d47a1 0%, #1a73e8 55%, #42a5f5 100%);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 99999; padding: 20px;
+        }
+        .auth-card {
+            background: white; border-radius: 24px; padding: 28px 24px;
+            width: 100%; max-width: 380px;
+            display: flex; flex-direction: column; gap: 16px;
+            box-shadow: 0 16px 56px rgba(0,0,0,0.35);
+        }
+        .auth-logo { text-align: center; padding-bottom: 4px; }
+        .auth-logo-icon { font-size: 50px; }
+        .auth-logo-title { font-size: 22px; font-weight: 800; color: #1a73e8; margin-top: 8px; }
+        .auth-logo-sub { font-size: 12px; color: #aaa; margin-top: 3px; }
+        .auth-tabs {
+            display: flex; border: 1.5px solid #e0e0e0;
+            border-radius: 12px; overflow: hidden;
+        }
+        .auth-tab-btn {
+            flex: 1; padding: 10px; border: none; background: white;
+            font-size: 14px; font-weight: 700; color: #888;
+            cursor: pointer; font-family: inherit; transition: all 0.15s;
+        }
+        .auth-tab-btn.active { background: #1a73e8; color: white; }
+        .auth-form { display: flex; flex-direction: column; gap: 10px; }
+        .auth-input {
+            width: 100%; padding: 12px 14px;
+            border: 1.5px solid #e0e0e0; border-radius: 10px;
+            font-size: 14px; outline: none; font-family: inherit; color: #333;
+            transition: border-color 0.2s;
+        }
+        .auth-input:focus { border-color: #1a73e8; }
+        .auth-btn {
+            width: 100%; padding: 14px;
+            background: linear-gradient(135deg, #1565c0, #1a73e8);
+            color: white; border: none; border-radius: 12px;
+            font-size: 15px; font-weight: 800; cursor: pointer; font-family: inherit;
+            box-shadow: 0 4px 14px rgba(26,115,232,0.4); margin-top: 2px;
+        }
+        .auth-error { font-size: 12px; color: #ef4444; min-height: 16px; line-height: 1.4; }
+        .logout-btn {
+            margin-top: 8px; padding: 8px 20px;
+            background: rgba(239,68,68,0.1); color: #ef4444;
+            border: 1.5px solid rgba(239,68,68,0.3); border-radius: 20px;
+            font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit;
+            transition: background 0.2s;
+        }
+        .logout-btn:hover { background: rgba(239,68,68,0.2); }
+        .account-delete-btn {
+            margin-top: 8px; padding: 8px 20px;
+            background: #dc2626; color: #ffffff;
+            border: none; border-radius: 20px;
+            font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit;
+            box-shadow: 0 2px 8px rgba(220,38,38,0.4);
+            transition: background 0.2s;
+        }
+        .account-delete-btn:hover { background: #b91c1c; }
+
+        /* ===== AI LOADING ===== */
+        @keyframes ai-spin { to { transform: rotate(360deg); } }
+        .ai-loading-spinner {
+            display: inline-block; width: 15px; height: 15px;
+            border: 2px solid #e8f0fe; border-top-color: #1a73e8;
+            border-radius: 50%; animation: ai-spin 0.75s linear infinite;
+            flex-shrink: 0;
+        }
+        .ai-loading-row {
+            display: flex; align-items: center; gap: 8px;
+            padding: 11px 14px; color: #1a73e8;
+            font-size: 14px; font-weight: 600;
+            background: #f0f7ff; border-radius: 10px;
+            border: 1.5px solid #90caf9;
+        }
+
+        /* ===== GUIDE PIN TOOLTIP ===== */
+        .guide-tooltip {
+            background: rgba(255,255,255,0.92) !important;
+            border: 1px solid #f59e0b !important;
+            border-radius: 6px !important;
+            font-size: 10px !important;
+            color: #555 !important;
+            padding: 2px 7px !important;
+            white-space: nowrap !important;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.15) !important;
+            font-family: 'Hiragino Sans', 'Yu Gothic', 'Meiryo', sans-serif !important;
+            font-weight: 600 !important;
+        }
+        .guide-tooltip::before { border-bottom-color: #f59e0b !important; }
     </style>
 </head>
 <body>
@@ -603,9 +700,9 @@
                         <span>📅</span><span id="weather-date">--</span>
                     </div>
                     <div class="weather-items-row">
-                        <div class="weather-item"><span>☀️</span><span>晴れ 23℃</span></div>
-                        <div class="weather-item"><span>🌊</span><span>中潮</span></div>
-                        <div class="weather-item"><span>💨</span><span>南西 3m/s</span></div>
+                        <div class="weather-item"><span id="weather-icon">☀️</span><span id="weather-label">晴れ 23℃</span></div>
+                        <div class="weather-item"><span>🌊</span><span id="weather-tide">中潮</span></div>
+                        <div class="weather-item"><span>💨</span><span id="weather-wind">南西 3m/s</span></div>
                         <div class="weather-item"><span>📍</span><span>東京湾</span></div>
                     </div>
                 </div>
@@ -700,6 +797,8 @@
                     <div class="profile-avatar" id="profile-avatar-display">🧑</div>
                     <div class="profile-name" id="profile-name-display">あなたのアカウント</div>
                     <button class="profile-edit-btn" onclick="showProfileEditModal()">⚙️ プロフィール編集</button>
+                    <button class="logout-btn" onclick="logout()">🚪 ログアウト</button>
+                    <button class="account-delete-btn" onclick="showDeleteAccountModal()">退会する</button>
                 </div>
 
                 <div class="stats-grid">
@@ -836,6 +935,27 @@
     </div>
 </div>
 
+<!-- Account Delete Confirm Modal -->
+<div class="modal-overlay" id="delete-account-modal" style="display:none">
+    <div class="modal-dialog">
+        <h3>🚨 アカウントを削除しますか？</h3>
+        <p style="color:#ef4444; font-weight:700;">この操作は絶対に取り消せません。</p>
+        <p>アカウントを削除すると、これまでのあなたの<b>釣果投稿もすべて完全に削除</b>されます。グループのメンバー情報からも除外されます。</p>
+        <button class="modal-btn-danger" onclick="executeDeleteAccount()">削除する（取り消し不可）</button>
+        <button class="modal-btn-cancel" onclick="closeDeleteAccountModal()">キャンセル</button>
+    </div>
+</div>
+
+<!-- Delete Confirm Modal -->
+<div class="modal-overlay" id="delete-confirm-modal" style="display:none">
+    <div class="modal-dialog">
+        <h3>🗑️ 投稿を削除</h3>
+        <p>本当にこの釣果投稿を削除しますか？<br>この操作は取り消せません。</p>
+        <button class="modal-btn-danger" onclick="executeDelete()">削除する</button>
+        <button class="modal-btn-cancel" onclick="closeDeleteConfirm()">キャンセル</button>
+    </div>
+</div>
+
 <div class="api-key-modal" id="api-key-modal" style="display:none">
     <div class="api-key-dialog">
         <h3>🔑 Gemini APIキーを設定</h3>
@@ -843,6 +963,41 @@
         <input type="password" class="api-key-input" id="api-key-input" placeholder="AIzaSy..." />
         <button class="api-key-save-btn" onclick="saveApiKey()">保存して判定する</button>
         <button class="api-key-cancel-btn" onclick="closeApiKeyModal()">キャンセル</button>
+    </div>
+</div>
+
+<!-- Auth Overlay -->
+<div id="auth-overlay" class="auth-overlay" style="display:none">
+    <div class="auth-card">
+        <div class="auth-logo">
+            <div class="auth-logo-icon">🎣</div>
+            <div class="auth-logo-title">FishingLog Share</div>
+            <div class="auth-logo-sub">仲間と釣果をリアルタイム共有</div>
+        </div>
+        <div class="auth-tabs">
+            <button class="auth-tab-btn active" id="auth-tab-login"  onclick="switchAuthMode('login')">ログイン</button>
+            <button class="auth-tab-btn"        id="auth-tab-signup" onclick="switchAuthMode('signup')">新規登録</button>
+        </div>
+        <!-- Login Form -->
+        <div id="auth-login-form" class="auth-form">
+            <input class="auth-input" id="login-name" type="text" placeholder="ニックネーム"
+                autocomplete="username" onkeydown="if(event.key==='Enter')document.getElementById('login-password').focus()" />
+            <input class="auth-input" id="login-password" type="password" placeholder="パスワード"
+                autocomplete="current-password" onkeydown="if(event.key==='Enter')submitLogin()" />
+            <div class="auth-error" id="login-error"></div>
+            <button class="auth-btn" onclick="submitLogin()">ログイン</button>
+        </div>
+        <!-- Signup Form -->
+        <div id="auth-signup-form" class="auth-form" style="display:none">
+            <input class="auth-input" id="signup-name" type="text" placeholder="ニックネーム（20文字以内）" maxlength="20"
+                autocomplete="username" onkeydown="if(event.key==='Enter')document.getElementById('signup-password').focus()" />
+            <input class="auth-input" id="signup-password" type="password" placeholder="パスワード（6文字以上）"
+                autocomplete="new-password" onkeydown="if(event.key==='Enter')document.getElementById('signup-password2').focus()" />
+            <input class="auth-input" id="signup-password2" type="password" placeholder="パスワード（確認）"
+                autocomplete="new-password" onkeydown="if(event.key==='Enter')submitSignup()" />
+            <div class="auth-error" id="signup-error"></div>
+            <button class="auth-btn" onclick="submitSignup()">アカウントを作成</button>
+        </div>
     </div>
 </div>
 
@@ -854,9 +1009,230 @@ const _now = new Date();
 const _DAYS = ['日','月','火','水','木','金','土'];
 const todayDateStr = `${_now.getMonth()+1}/${_now.getDate()}(${_DAYS[_now.getDay()]})`;
 
+// ===== Daily Weather Generator (date-seeded, no external API) =====
+const _TIDE_CYCLE = [
+    '大潮','大潮','大潮',
+    '中潮','中潮','中潮','中潮',
+    '小潮','小潮','小潮',
+    '長潮','若潮',
+    '中潮','中潮','中潮',
+    '大潮','大潮','大潮',
+    '中潮','中潮','中潮','中潮',
+    '小潮','小潮','小潮',
+    '長潮','若潮',
+    '中潮','中潮','中潮'
+]; // 30-day lunar approximation
+
+function _dateRand(date) {
+    const n = date.getFullYear() * 366 + (date.getMonth() + 1) * 31 + date.getDate();
+    let h = Math.imul(n, 0x9e3779b9); h ^= h >>> 16;
+    h = (Math.imul(h, 0x85ebca6b) >>> 0);
+    // Returns a function: salt→deterministic uint32
+    return (salt) => {
+        let v = Math.imul(h ^ Math.imul(salt, 0x45d9f3b), 0x1b873593);
+        v ^= v >>> 16;
+        return (v >>> 0);
+    };
+}
+
+function generateWeatherData(date) {
+    const rand = _dateRand(date);
+
+    // Tide: 30-day lunar cycle from a known 大潮 reference (2024-01-11 ≈ full moon)
+    const REF = new Date(2024, 0, 11);
+    const dayN = Math.floor((date - REF) / 86400000);
+    const tide = _TIDE_CYCLE[((dayN % 30) + 30) % 30];
+
+    // Weather: weighted pick (100 total weight)
+    const WEATHERS = [
+        { icon: '☀️',  label: '晴れ',           w: 40 },
+        { icon: '🌤️', label: 'くもり時々晴れ', w: 20 },
+        { icon: '⛅',  label: '晴れのちくもり', w: 18 },
+        { icon: '☁️',  label: 'くもり',          w: 12 },
+        { icon: '🌧️', label: '雨',              w: 7  },
+        { icon: '⛈️', label: '雷雨',            w: 3  },
+    ];
+    const wVal = rand(1) % 100;
+    let wCum = 0, weather = WEATHERS[0];
+    for (const w of WEATHERS) { wCum += w.w; if (wVal < wCum) { weather = w; break; } }
+
+    // Temperature: seasonal base ± 3℃ daily variation
+    const MONTH_TEMP = [8, 9, 13, 18, 23, 26, 30, 31, 27, 21, 15, 10];
+    const temp = MONTH_TEMP[date.getMonth()] + (rand(2) % 7) - 3;
+
+    // Wind direction & speed (2–7 m/s)
+    const DIRS = ['北','北東','東','南東','南','南西','西','北西'];
+    const windDir   = DIRS[rand(3) % DIRS.length];
+    const windSpeed = 2 + (rand(4) % 6);
+
+    return { weather, tide, temp, windDir, windSpeed };
+}
+
+const todayWeather = generateWeatherData(_now);
+
+function applyWeatherCard() {
+    document.getElementById('weather-date').textContent  = todayDateStr;
+    document.getElementById('weather-icon').textContent  = todayWeather.weather.icon;
+    document.getElementById('weather-label').textContent = `${todayWeather.weather.label} ${todayWeather.temp}℃`;
+    document.getElementById('weather-tide').textContent  = todayWeather.tide;
+    document.getElementById('weather-wind').textContent  = `${todayWeather.windDir} ${todayWeather.windSpeed}m/s`;
+}
+
+// ===== Auth =====
+let accounts = JSON.parse(localStorage.getItem('fishinglog_accounts')) || [];
+let currentSession = JSON.parse(localStorage.getItem('fishinglog_session')) || null;
+
+function _hashPwd(str) {
+    let h = 5381;
+    for (let i = 0; i < str.length; i++) { h = (((h << 5) + h) ^ str.charCodeAt(i)) >>> 0; }
+    return h.toString(16);
+}
+function _saveAccounts() { localStorage.setItem('fishinglog_accounts', JSON.stringify(accounts)); }
+function _saveSession(s) {
+    currentSession = s;
+    if (s) localStorage.setItem('fishinglog_session', JSON.stringify(s));
+    else localStorage.removeItem('fishinglog_session');
+}
+
+function showAuthOverlay() {
+    document.getElementById('login-name').value      = '';
+    document.getElementById('login-password').value  = '';
+    document.getElementById('login-error').textContent = '';
+    document.getElementById('signup-name').value     = '';
+    document.getElementById('signup-password').value = '';
+    document.getElementById('signup-password2').value = '';
+    document.getElementById('signup-error').textContent = '';
+    switchAuthMode('login');
+    document.getElementById('auth-overlay').style.display = 'flex';
+    setTimeout(() => document.getElementById('login-name').focus(), 100);
+}
+function hideAuthOverlay() { document.getElementById('auth-overlay').style.display = 'none'; }
+
+function switchAuthMode(mode) {
+    document.getElementById('auth-login-form').style.display  = mode === 'login'  ? 'flex' : 'none';
+    document.getElementById('auth-signup-form').style.display = mode === 'signup' ? 'flex' : 'none';
+    document.getElementById('auth-tab-login').classList.toggle('active',  mode === 'login');
+    document.getElementById('auth-tab-signup').classList.toggle('active', mode === 'signup');
+    document.getElementById('login-error').textContent  = '';
+    document.getElementById('signup-error').textContent = '';
+    setTimeout(() => {
+        document.getElementById(mode === 'login' ? 'login-name' : 'signup-name').focus();
+    }, 50);
+}
+
+function _applySession(acc) {
+    _saveSession({ id: acc.id, name: acc.name, emoji: acc.emoji, photo: acc.photo || null });
+    myProfile = { name: acc.name, emoji: acc.emoji, photo: acc.photo || null };
+    localStorage.setItem('fishinglog_profile', JSON.stringify(myProfile));
+    refreshMyPostFlags();
+    hideAuthOverlay();
+    renderProfileCard();
+    renderMapPins();
+    renderTimeline();
+    renderMyPosts();
+    updateStats();
+    renderPrefList();
+}
+
+function submitLogin() {
+    const name  = document.getElementById('login-name').value.trim();
+    const pwd   = document.getElementById('login-password').value;
+    const errEl = document.getElementById('login-error');
+    if (!name) { errEl.textContent = '⚠️ ニックネームを入力してください'; return; }
+    if (!pwd)  { errEl.textContent = '⚠️ パスワードを入力してください'; return; }
+    const acc = accounts.find(a => a.name === name && a.passwordHash === _hashPwd(pwd));
+    if (!acc) { errEl.textContent = '⚠️ ニックネームまたはパスワードが正しくありません'; return; }
+    _applySession(acc);
+    showToast(`✅ おかえりなさい、${acc.name} さん！`);
+}
+
+function submitSignup() {
+    const name  = document.getElementById('signup-name').value.trim();
+    const pwd   = document.getElementById('signup-password').value;
+    const pwd2  = document.getElementById('signup-password2').value;
+    const errEl = document.getElementById('signup-error');
+    if (!name)          { errEl.textContent = '⚠️ ニックネームを入力してください'; return; }
+    if (pwd.length < 6) { errEl.textContent = '⚠️ パスワードは6文字以上にしてください'; return; }
+    if (pwd !== pwd2)   { errEl.textContent = '⚠️ パスワードが一致しません'; return; }
+    const newAcc = { id: 'u_' + Date.now(), name, emoji: '🎣', photo: null, passwordHash: _hashPwd(pwd) };
+    accounts.push(newAcc);
+    _saveAccounts();
+    _applySession(newAcc);
+    showToast(`🎉 ようこそ、${name} さん！アカウントを作成しました`);
+}
+
+function logout() {
+    _saveSession(null);
+    myProfile = { name: 'あなた', emoji: '🧑', photo: null };
+    refreshMyPostFlags();
+    renderTimeline();
+    renderMyPosts();
+    renderMapPins();
+    updateStats();
+    renderPrefList();
+    renderProfileCard();
+    showAuthOverlay();
+}
+
+function refreshMyPostFlags() {
+    posts.forEach(p => {
+        if (p.accountId !== undefined) {
+            p.isMyPost = !!(currentSession && p.accountId === currentSession.id);
+        }
+    });
+}
+
+// ===== Account Delete =====
+function showDeleteAccountModal() {
+    document.getElementById('delete-account-modal').style.display = 'flex';
+}
+
+function closeDeleteAccountModal() {
+    document.getElementById('delete-account-modal').style.display = 'none';
+}
+
+function executeDeleteAccount() {
+    // 二段階確認（第2ステップ：ブラウザconfirm）
+    if (!confirm('本当に戻せませんがよろしいですか？\nアカウントとすべての釣果データが完全に削除されます。')) return;
+    if (!currentSession) { closeDeleteAccountModal(); return; }
+
+    const accountId = currentSession.id;
+
+    // アカウントレコード削除
+    accounts = accounts.filter(a => a.id !== accountId);
+    _saveAccounts();
+
+    // 投稿を連動削除：accountId一致分 + accountId未設定の自分の投稿（レガシーデータ）
+    posts = posts.filter(p =>
+        p.accountId !== undefined ? p.accountId !== accountId : !p.isMyPost
+    );
+    savePosts();
+
+    // グループの自分のメンバーエントリを削除
+    groups.forEach(g => { g.members = g.members.filter(m => !m.isMe); });
+    saveGroups();
+
+    // セッション・プロフィールをリセット
+    _saveSession(null);
+    myProfile = { name: 'あなた', emoji: '🧑', photo: null };
+
+    // 全画面を再描画してから認証画面へ
+    refreshMyPostFlags();
+    closeDeleteAccountModal();
+    renderTimeline();
+    renderMyPosts();
+    renderMapPins();
+    updateStats();
+    renderPrefList();
+    renderProfileCard();
+    showAuthOverlay();
+}
+
 // ===== Profile =====
 const AVATAR_EMOJIS = ['🧑','👩','👨','🧒','🧔','👴','👵','🎣','🐟','🐠','🐡','🦈','⛵','🏄','🌊','🏕️'];
-let myProfile = JSON.parse(localStorage.getItem('fishinglog_profile')) || { name: 'あなた', emoji: '🧑', photo: null };
+let myProfile = currentSession
+    ? { name: currentSession.name, emoji: currentSession.emoji, photo: currentSession.photo || null }
+    : (JSON.parse(localStorage.getItem('fishinglog_profile')) || { name: 'あなた', emoji: '🧑', photo: null });
 let selectedAvatarEmoji = myProfile.emoji;
 
 // ===== Mock Data =====
@@ -877,14 +1253,24 @@ window.addEventListener('load', () => {
         attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a>'
     }).addTo(map);
 
+    // 未ログイン時は認証画面を表示
+    if (!currentSession) { showAuthOverlay(); }
+
+    // セッションに基づいて isMyPost フラグを再計算
+    refreshMyPostFlags();
+
     // Sync group member data to current profile
     groups.forEach(g => g.members.forEach(m => {
         if (m.isMe) { m.name = myProfile.name; m.emoji = myProfile.emoji; }
     }));
 
-    document.getElementById('weather-date').textContent = todayDateStr;
+    applyWeatherCard();
     renderProfileCard();
     renderMapPins();
+    renderGuidePins();
+    map.on('zoomend', updateGuidePinsVisibility);
+    map.on('moveend', () => { if (map.getZoom() >= GUIDE_ZOOM_THRESHOLD) fetchAndUpdateGuidePins(); });
+    updateGuidePinsVisibility();
     renderTimeline();
     renderGroups();
     renderMyPosts();
@@ -916,6 +1302,7 @@ function renderMyPosts() {
             </div>
             <div class="post-actions">
                 <button class="action-btn" onclick="startEditPost(${post.id},'mypage')" style="color:#1a73e8; font-weight:700;">✏️ 編集</button>
+                <button class="action-btn" onclick="showDeleteConfirm(${post.id})" style="color:#ef4444; font-weight:700;">🗑️ 削除</button>
                 <button class="action-btn" onclick="showOnMap(${post.lat}, ${post.lng})">🗺️ 地図で見る</button>
             </div>
         </div>`).join('') + `</div>`;
@@ -941,7 +1328,10 @@ function renderMapPins() {
         });
         const marker = L.marker([post.lat, post.lng], { icon }).addTo(map);
         const editBtnHtml = post.isMyPost
-            ? `<div style="margin-top:8px;"><button onclick="startEditPost(${post.id},'map')" style="background:#e8f0fe;color:#1a73e8;border:none;border-radius:8px;padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer;width:100%;font-family:sans-serif;">この投稿を編集する 📝</button></div>`
+            ? `<div style="margin-top:8px;display:flex;gap:6px;">
+                <button onclick="startEditPost(${post.id},'map')" style="background:#e8f0fe;color:#1a73e8;border:none;border-radius:8px;padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer;flex:1;font-family:sans-serif;">この投稿を編集する 📝</button>
+                <button onclick="showDeleteConfirm(${post.id})" style="background:#fee2e2;color:#ef4444;border:none;border-radius:8px;padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer;flex:1;font-family:sans-serif;">削除する 🗑️</button>
+              </div>`
             : '';
         marker.bindPopup(`
             <div style="font-family:sans-serif; min-width:160px;">
@@ -957,6 +1347,357 @@ function renderMapPins() {
 
 function addMapPin(post) {
     renderMapPins();
+}
+
+// ===== Guide Pins (zoom-dependent ⚓ markers with real-time Open-Meteo weather) =====
+const GUIDE_ZOOM_THRESHOLD = 10;
+let guidePortLayer = null;
+let guideMarkers   = {};          // portId → Leaflet marker
+const portWeatherCache = {};      // portId → { data, timestamp }
+const GUIDE_CACHE_TTL  = 30 * 60 * 1000; // 30分キャッシュ
+let guideFetchInProgress = false;
+
+const SEASON_LABELS = { spring:'春', summer:'夏', autumn:'秋', winter:'冬' };
+
+// シーズン別・各港マスターデータ（全国60大釣り場）
+const GUIDE_PORTS = [
+    // === 北海道（3箇所）===
+    { id:'wakkanai',       lat:45.408, lng:141.672, name:'稚内港港湾',             pref:'北海道',
+      baseFish:{ spring:['カレイ','ソイ','ホッケ','アブラコ'], summer:['チカ','イカ','ホッケ','サバ'], autumn:['サケ','イカ','サバ','カレイ'], winter:['コマイ','カレイ','ソイ','ホッケ'] } },
+    { id:'tomakomai',      lat:42.640, lng:141.614, name:'苫小牧港西防波堤',       pref:'北海道',
+      baseFish:{ spring:['カレイ','ホッケ','アブラコ','ソイ'], summer:['サバ','チカ','イカ','マゾイ'], autumn:['サケ','サバ','イカ','カレイ'], winter:['コマイ','カレイ','ソイ','ホッケ'] } },
+    { id:'otaru',          lat:43.183, lng:141.000, name:'小樽港マリーナ周辺',     pref:'北海道',
+      baseFish:{ spring:['カレイ','ホッケ','ソイ','メバル'], summer:['チカ','サバ','イカ','マゾイ'], autumn:['サケ','サバ','イカ','カレイ'], winter:['コマイ','カレイ','ホッケ','ソイ'] } },
+    // === 東北（6箇所）===
+    { id:'aomori_chuo',    lat:40.823, lng:140.706, name:'青森港新中央埠頭',       pref:'青森県',
+      baseFish:{ spring:['メバル','カレイ','アイナメ','サヨリ'], summer:['マコガレイ','アジ','サバ','ヒラメ'], autumn:['サバ','ヒラメ','アジ','カレイ'], winter:['タラ','カレイ','ソイ','アイナメ'] } },
+    { id:'miyako',         lat:39.645, lng:141.957, name:'宮古港出崎地区',         pref:'岩手県',
+      baseFish:{ spring:['アイナメ','カレイ','メバル','ソイ'], summer:['アジ','ヒラメ','マコガレイ','サバ'], autumn:['ヒラメ','サバ','アジ','カレイ'], winter:['タラ','カレイ','アイナメ','ソイ'] } },
+    { id:'shiogama',       lat:38.313, lng:141.020, name:'仙台塩釜港（貞山運河）', pref:'宮城県',
+      baseFish:{ spring:['アイナメ','カレイ','メバル','ハゼ'], summer:['アジ','マコガレイ','ヒラメ','シーバス'], autumn:['ヒラメ','サバ','カレイ','シーバス'], winter:['カレイ','タラ','アイナメ','メバル'] } },
+    { id:'akita_serion',   lat:39.752, lng:140.091, name:'秋田港セリオン前',       pref:'秋田県',
+      baseFish:{ spring:['カレイ','メバル','アイナメ','サヨリ'], summer:['アジ','サバ','ヒラメ','シーバス'], autumn:['ヒラメ','アジ','カレイ','サバ'], winter:['カレイ','タラ','メバル','アイナメ'] } },
+    { id:'sakata',         lat:38.913, lng:139.847, name:'酒田港水路付近',         pref:'山形県',
+      baseFish:{ spring:['アジ','カレイ','メバル','サヨリ'], summer:['アジ','サバ','ヒラメ','シーバス'], autumn:['ヒラメ','アジ','サバ','カレイ'], winter:['カレイ','タラ','ソイ','メバル'] } },
+    { id:'iwaki_onahama',  lat:36.931, lng:140.897, name:'いわき小名浜港',         pref:'福島県',
+      baseFish:{ spring:['アイナメ','カレイ','メバル','サヨリ'], summer:['アジ','サバ','ヒラメ','シーバス'], autumn:['ヒラメ','カツオ','サバ','タチウオ'], winter:['カレイ','アイナメ','タコ','メバル'] } },
+    // === 関東（10箇所）===
+    { id:'oarai',            lat:36.316, lng:140.577, name:'大洗港親水中央',         pref:'茨城県',
+      baseFish:{ spring:['アジ','カレイ','アイナメ','ヒラメ'], summer:['アジ','サバ','シーバス','イワシ'], autumn:['タチウオ','アジ','ヒラメ','サバ'], winter:['カレイ','アイナメ','メバル','シーバス'] } },
+    { id:'kashima',          lat:35.963, lng:140.666, name:'鹿島港魚釣園',           pref:'茨城県',
+      baseFish:{ spring:['アジ','カレイ','シーバス','サヨリ'], summer:['アジ','サバ','シーバス','タコ'], autumn:['タチウオ','イナダ','アジ','シーバス'], winter:['カレイ','アイナメ','シーバス','メバル'] } },
+    { id:'futtsu',           lat:35.318, lng:139.820, name:'富津みなと公園',         pref:'千葉県',
+      baseFish:{ spring:['シーバス','クロダイ','アジ','ハゼ'], summer:['アジ','キス','シーバス','クロダイ'], autumn:['タチウオ','アジ','シーバス','ワカシ'], winter:['シーバス','カレイ','ハゼ','クロダイ'] } },
+    { id:'wakasu',           lat:35.656, lng:139.864, name:'若洲海浜公園',           pref:'東京都',
+      baseFish:{ spring:['シーバス','カレイ','アジ','クロダイ'], summer:['アジ','シーバス','イワシ','サバ'], autumn:['タチウオ','サバ','ワカシ','シーバス'], winter:['シーバス','カレイ','アイナメ','クロダイ'] } },
+    { id:'chiba_port',       lat:35.617, lng:140.115, name:'千葉ポートパーク',       pref:'千葉県',
+      baseFish:{ spring:['シーバス','ハゼ','カレイ','クロダイ'], summer:['アジ','シーバス','コノシロ','クロダイ'], autumn:['タチウオ','シーバス','アジ','イナダ'], winter:['シーバス','カレイ','ハゼ','アイナメ'] } },
+    { id:'kemigawa',         lat:35.641, lng:140.047, name:'検見川堤防',             pref:'千葉県',
+      baseFish:{ spring:['シーバス','クロダイ','ハゼ','アジ'], summer:['アジ','シーバス','クロダイ','コノシロ'], autumn:['タチウオ','アジ','シーバス','イナダ'], winter:['シーバス','ハゼ','カレイ','クロダイ'] } },
+    { id:'oi_futo',          lat:35.594, lng:139.746, name:'大井ふ頭中央海浜公園',   pref:'東京都',
+      baseFish:{ spring:['シーバス','クロダイ','アジ','ハゼ'], summer:['アジ','シーバス','クロダイ','タコ'], autumn:['タチウオ','シーバス','アジ','イナダ'], winter:['シーバス','カレイ','ハゼ','クロダイ'] } },
+    { id:'honmoku',          lat:35.421, lng:139.638, name:'本牧海釣り施設',         pref:'神奈川県',
+      baseFish:{ spring:['メバル','カサゴ','アジ','クロダイ'], summer:['アジ','シーバス','クロダイ','タコ'], autumn:['アジ','サバ','タチウオ','シーバス'], winter:['カレイ','アイナメ','メバル','シロギス'] } },
+    { id:'daikoku',          lat:35.472, lng:139.661, name:'大黒海釣り施設',         pref:'神奈川県',
+      baseFish:{ spring:['メバル','カサゴ','クロダイ','アジ'], summer:['アジ','シーバス','クロダイ','キス'], autumn:['アジ','タチウオ','シーバス','サバ'], winter:['カレイ','メバル','タコ','シーバス'] } },
+    { id:'higashi_ogishima', lat:35.496, lng:139.698, name:'東扇島西公園',           pref:'神奈川県',
+      baseFish:{ spring:['シーバス','クロダイ','アジ','メバル'], summer:['アジ','クロダイ','シーバス','タコ'], autumn:['タチウオ','アジ','シーバス','イナダ'], winter:['カレイ','シーバス','アイナメ','クロダイ'] } },
+    // === 北陸（6箇所）===
+    { id:'niigata_higashiko', lat:37.954, lng:139.143, name:'新潟東港ハッピーフィッシング', pref:'新潟県',
+      baseFish:{ spring:['アジ','メバル','カレイ','サヨリ'], summer:['アジ','サバ','シーバス','キス'], autumn:['ハマチ','アジ','サバ','ヒラメ'], winter:['カレイ','タラ','ソイ','メバル'] } },
+    { id:'naoetsu',          lat:37.153, lng:138.246, name:'直江津港第3東堤防',     pref:'新潟県',
+      baseFish:{ spring:['アジ','メバル','カレイ','サヨリ'], summer:['アジ','サバ','シーバス','キス'], autumn:['フクラギ','アジ','サバ','ヒラメ'], winter:['カレイ','ソイ','メバル','タラ'] } },
+    { id:'toyama_shinko',    lat:36.770, lng:137.087, name:'富山新港北堤防',         pref:'富山県',
+      baseFish:{ spring:['アジ','サヨリ','カレイ','メバル'], summer:['アジ','キス','シーバス','タコ'], autumn:['ハマチ','フクラギ','アジ','ヒラメ'], winter:['ブリ','カレイ','ソイ','タラ'] } },
+    { id:'kanazawa',         lat:36.580, lng:136.616, name:'金沢港無量寺埠頭',       pref:'石川県',
+      baseFish:{ spring:['アジ','メバル','カレイ','サヨリ'], summer:['アジ','キス','シーバス','タコ'], autumn:['ガンド','アジ','サバ','タチウオ'], winter:['ブリ','カレイ','ガシラ','タラ'] } },
+    { id:'tsuruga',          lat:35.636, lng:136.063, name:'敦賀港新港岸壁',         pref:'福井県',
+      baseFish:{ spring:['メバル','アジ','サヨリ','カレイ'], summer:['アジ','キス','チヌ','シーバス'], autumn:['ハマチ','アジ','チヌ','タチウオ'], winter:['カレイ','ガシラ','メバル','タラ'] } },
+    { id:'obama',            lat:35.493, lng:135.744, name:'小浜港',                 pref:'福井県',
+      baseFish:{ spring:['メバル','アジ','カレイ','サヨリ'], summer:['アジ','チヌ','キス','シーバス'], autumn:['ハマチ','アジ','チヌ','タチウオ'], winter:['カレイ','ガシラ','メバル','アイナメ'] } },
+    // === 東海（6箇所）===
+    { id:'atami',            lat:35.097, lng:139.076, name:'熱海海釣り施設',         pref:'静岡県',
+      baseFish:{ spring:['メジナ','アジ','サヨリ','カサゴ'], summer:['アジ','サバ','シイラ','シーバス'], autumn:['カツオ','アジ','タチウオ','ハマチ'], winter:['メジナ','アジ','カレイ','ガシラ'] } },
+    { id:'shimizu',          lat:35.003, lng:138.499, name:'清水港海釣り公園',       pref:'静岡県',
+      baseFish:{ spring:['アジ','サヨリ','メジナ','シーバス'], summer:['アジ','サバ','シーバス','タコ'], autumn:['カツオ','タチウオ','アジ','ハマチ'], winter:['アジ','メジナ','カレイ','シーバス'] } },
+    { id:'omaezaki',         lat:34.583, lng:138.209, name:'御前崎港西防波堤',       pref:'静岡県',
+      baseFish:{ spring:['アジ','メジナ','サヨリ','カサゴ'], summer:['シイラ','カツオ','アジ','サバ'], autumn:['カツオ','タチウオ','アジ','ハマチ'], winter:['メジナ','カレイ','アジ','ガシラ'] } },
+    { id:'nagoya_kaitsuri',  lat:35.060, lng:136.882, name:'名古屋港海釣り公園',     pref:'愛知県',
+      baseFish:{ spring:['シーバス','ハゼ','サヨリ','クロダイ'], summer:['ハゼ','キス','シーバス','クロダイ'], autumn:['タチウオ','シーバス','ハゼ','クロダイ'], winter:['カレイ','シーバス','ハゼ','アイナメ'] } },
+    { id:'toyohama',         lat:34.701, lng:136.877, name:'豊浜釣り桟橋（知多半島）', pref:'愛知県',
+      baseFish:{ spring:['アジ','チヌ','サヨリ','メバル'], summer:['アジ','キス','シーバス','チヌ'], autumn:['タチウオ','アジ','チヌ','アオリイカ'], winter:['カレイ','ガシラ','アジ','メバル'] } },
+    { id:'yokkaichi',        lat:34.961, lng:136.624, name:'四日市霞ヶ浦埠頭',       pref:'三重県',
+      baseFish:{ spring:['チヌ','シーバス','サヨリ','アジ'], summer:['シーバス','キス','ハゼ','チヌ'], autumn:['タチウオ','シーバス','チヌ','アジ'], winter:['カレイ','ガシラ','シーバス','チヌ'] } },
+    // === 近畿（7箇所）===
+    { id:'maizuru',          lat:35.467, lng:135.371, name:'舞鶴親海公園釣り桟橋',   pref:'京都府',
+      baseFish:{ spring:['メバル','アジ','カレイ','サヨリ'], summer:['アジ','チヌ','シーバス','キス'], autumn:['ハマチ','アジ','チヌ','アオリイカ'], winter:['カレイ','ガシラ','メバル','タラ'] } },
+    { id:'osaka_nanko',      lat:34.626, lng:135.429, name:'大阪南港魚つり園',       pref:'大阪府',
+      baseFish:{ spring:['チヌ','メバル','アジ','サヨリ'], summer:['アジ','チヌ','シーバス','タチウオ'], autumn:['タチウオ','ハマチ','アジ','チヌ'], winter:['カレイ','ガシラ','アジ','チヌ'] } },
+    { id:'kobe_hiraiso',     lat:34.671, lng:135.117, name:'神戸平磯海釣り公園',     pref:'兵庫県',
+      baseFish:{ spring:['メバル','カサゴ','チヌ','アジ'], summer:['アジ','チヌ','タコ','キス'], autumn:['タチウオ','ハマチ','チヌ','アジ'], winter:['ガシラ','カレイ','アジ','メバル'] } },
+    { id:'amagasaki',        lat:34.706, lng:135.415, name:'尼崎市立魚つり公園',     pref:'兵庫県',
+      baseFish:{ spring:['チヌ','メバル','アジ','サヨリ'], summer:['アジ','チヌ','シーバス','タコ'], autumn:['タチウオ','ハマチ','アジ','チヌ'], winter:['カレイ','ガシラ','メバル','チヌ'] } },
+    { id:'naruo',            lat:34.725, lng:135.391, name:'鳴尾浜海釣り広場',       pref:'兵庫県',
+      baseFish:{ spring:['メバル','チヌ','アジ','サヨリ'], summer:['アジ','チヌ','シーバス','タコ'], autumn:['タチウオ','ハマチ','アジ','チヌ'], winter:['カレイ','ガシラ','メバル','チヌ'] } },
+    { id:'marinacity',       lat:34.190, lng:135.183, name:'マリーナシティ大波止',   pref:'和歌山県',
+      baseFish:{ spring:['チヌ','メバル','アジ','サヨリ'], summer:['アジ','タチウオ','チヌ','タコ'], autumn:['タチウオ','ハマチ','アジ','アオリイカ'], winter:['カレイ','ガシラ','チヌ','メバル'] } },
+    { id:'yura',             lat:33.957, lng:135.110, name:'由良海釣り公園',         pref:'和歌山県',
+      baseFish:{ spring:['メバル','グレ','アジ','カサゴ'], summer:['アジ','チヌ','イサキ','マダイ'], autumn:['タチウオ','ハマチ','アジ','アオリイカ'], winter:['グレ','メバル','カレイ','ガシラ'] } },
+    // === 中国・四国（9箇所）===
+    { id:'sakaiminato',      lat:35.542, lng:133.231, name:'境港竹内埠頭',           pref:'鳥取県',
+      baseFish:{ spring:['アジ','メバル','カレイ','サヨリ'], summer:['アジ','チヌ','シーバス','タコ'], autumn:['ハマチ','アジ','チヌ','アオリイカ'], winter:['カレイ','ガシラ','メバル','タラ'] } },
+    { id:'shichirui',        lat:35.554, lng:133.024, name:'七類港（松江）',         pref:'島根県',
+      baseFish:{ spring:['アジ','メバル','カレイ','サヨリ'], summer:['アジ','チヌ','スズキ','キス'], autumn:['ブリ','アジ','チヌ','アオリイカ'], winter:['カレイ','タラ','メバル','ガシラ'] } },
+    { id:'uno',              lat:34.492, lng:133.954, name:'宇野港埠頭',             pref:'岡山県',
+      baseFish:{ spring:['チヌ','メバル','アジ','サヨリ'], summer:['アジ','タコ','チヌ','キス'], autumn:['ハマチ','タチウオ','アジ','アオリイカ'], winter:['カレイ','アナゴ','チヌ','メバル'] } },
+    { id:'hiroshima_ujina',  lat:34.364, lng:132.465, name:'広島宇品港みなと公園',   pref:'広島県',
+      baseFish:{ spring:['チヌ','メバル','カレイ','アジ'], summer:['アジ','チヌ','タコ','キス'], autumn:['ハマチ','アジ','チヌ','タチウオ'], winter:['カレイ','アナゴ','チヌ','メバル'] } },
+    { id:'shimonoseki_aruka', lat:33.953, lng:130.943, name:'下関あるかぽーと岸壁',  pref:'山口県',
+      baseFish:{ spring:['メバル','アジ','カレイ','サヨリ'], summer:['アジ','チヌ','タコ','キス'], autumn:['タチウオ','アジ','ハマチ','アオリイカ'], winter:['フグ','カレイ','メバル','ガシラ'] } },
+    { id:'naruto',           lat:34.183, lng:134.620, name:'鳴門岡崎海岸',           pref:'徳島県',
+      baseFish:{ spring:['チヌ','メバル','アジ','サヨリ'], summer:['アジ','タコ','チヌ','キス'], autumn:['タチウオ','ハマチ','アジ','アオリイカ'], winter:['カレイ','メバル','チヌ','ガシラ'] } },
+    { id:'takamatsu',        lat:34.350, lng:134.047, name:'高松サンポート岸壁',     pref:'香川県',
+      baseFish:{ spring:['チヌ','メバル','アジ','サヨリ'], summer:['タコ','アジ','チヌ','キス'], autumn:['タチウオ','ハマチ','アジ','アオリイカ'], winter:['カレイ','アナゴ','チヌ','メバル'] } },
+    { id:'matsuyama_kanko',  lat:33.840, lng:132.704, name:'松山観光港周辺堤防',     pref:'愛媛県',
+      baseFish:{ spring:['アジ','チヌ','メバル','サヨリ'], summer:['マダイ','アジ','イサキ','タコ'], autumn:['ハマチ','タチウオ','アジ','アオリイカ'], winter:['カレイ','メバル','チヌ','ガシラ'] } },
+    { id:'kochi_shinko',     lat:33.559, lng:133.568, name:'高知新港防波堤',         pref:'高知県',
+      baseFish:{ spring:['アジ','チヌ','カサゴ','サヨリ'], summer:['シイラ','カツオ','アジ','チヌ'], autumn:['カツオ','ハマチ','アジ','アオリイカ'], winter:['メジナ','チヌ','アジ','カサゴ'] } },
+    // === 九州（9箇所）===
+    { id:'fukuoka_imaztu',     lat:33.619, lng:130.341, name:'福岡市海づり公園（今津）', pref:'福岡県',
+      baseFish:{ spring:['チヌ','メバル','アジ','ヒラメ'], summer:['アジ','シーバス','チヌ','タチウオ'], autumn:['タチウオ','アジ','ハマチ','ヒラメ'], winter:['カレイ','アジ','メバル','チヌ'] } },
+    { id:'kitakyushu_hinomae', lat:33.889, lng:130.867, name:'日明うみづり公園（北九州）', pref:'福岡県',
+      baseFish:{ spring:['チヌ','アジ','メバル','カレイ'], summer:['アジ','チヌ','シーバス','タコ'], autumn:['タチウオ','アジ','ハマチ','チヌ'], winter:['カレイ','メバル','アジ','ガシラ'] } },
+    { id:'karatsu',            lat:33.451, lng:129.975, name:'唐津港東港',             pref:'佐賀県',
+      baseFish:{ spring:['チヌ','アジ','メバル','サヨリ'], summer:['アジ','チヌ','シーバス','タコ'], autumn:['タチウオ','アジ','ハマチ','チヌ'], winter:['カレイ','ガシラ','アジ','メバル'] } },
+    { id:'nagasaki_motoune',   lat:32.748, lng:129.868, name:'長崎港元船埠頭',         pref:'長崎県',
+      baseFish:{ spring:['メバル','アジ','カサゴ','サヨリ'], summer:['アジ','チヌ','イカ','タコ'], autumn:['タチウオ','ハマチ','アジ','アオリイカ'], winter:['メバル','カレイ','ガシラ','チヌ'] } },
+    { id:'misumi',             lat:32.525, lng:130.540, name:'三角東港',               pref:'熊本県',
+      baseFish:{ spring:['チヌ','メバル','アジ','サヨリ'], summer:['アジ','チヌ','タコ','シーバス'], autumn:['タチウオ','ハマチ','アジ','アオリイカ'], winter:['カレイ','ガシラ','チヌ','メバル'] } },
+    { id:'oita',               lat:33.237, lng:131.609, name:'大分コンビナート裏岸壁', pref:'大分県',
+      baseFish:{ spring:['アジ','メバル','チヌ','サヨリ'], summer:['アジ','イカ','チヌ','タコ'], autumn:['タチウオ','アジ','ハマチ','アオリイカ'], winter:['カレイ','メバル','アジ','ガシラ'] } },
+    { id:'miyazaki',           lat:31.920, lng:131.432, name:'宮崎港第3埠頭',          pref:'宮崎県',
+      baseFish:{ spring:['アジ','チヌ','シーバス','サヨリ'], summer:['アジ','シーバス','カンパチ','タコ'], autumn:['タチウオ','アジ','カンパチ','アオリイカ'], winter:['メジナ','アジ','チヌ','カサゴ'] } },
+    { id:'kagoshima_honko',    lat:31.601, lng:130.558, name:'鹿児島港本港区',         pref:'鹿児島県',
+      baseFish:{ spring:['アジ','メジナ','チヌ','サヨリ'], summer:['シイラ','カツオ','アジ','タコ'], autumn:['タチウオ','カンパチ','アジ','アオリイカ'], winter:['メジナ','アジ','チヌ','カサゴ'] } },
+    { id:'kamoko',             lat:31.562, lng:130.566, name:'鴨池海釣り公園',         pref:'鹿児島県',
+      baseFish:{ spring:['アジ','チヌ','カサゴ','サヨリ'], summer:['アジ','シーバス','タコ','クロダイ'], autumn:['タチウオ','カンパチ','アジ','アオリイカ'], winter:['アジ','チヌ','カサゴ','メバル'] } },
+    // === 沖縄（4箇所）===
+    { id:'naha_miegusuku',  lat:26.217, lng:127.660, name:'那覇港三重城港',   pref:'沖縄県',
+      baseFish:{ spring:['タマン','グルクン','ガーラ','チヌ'], summer:['シイラ','カーエー','タマン','ガーラ'], autumn:['タマン','グルクン','ガーラ','カーエー'], winter:['ミーバイ','タマン','チヌ','グルクン'] } },
+    { id:'ginowan',         lat:26.278, lng:127.738, name:'宜野湾マリーナ裏', pref:'沖縄県',
+      baseFish:{ spring:['タマン','グルクン','チヌ','ミーバイ'], summer:['シイラ','カーエー','タマン','ガーラ'], autumn:['タマン','ガーラ','グルクン','カーエー'], winter:['ミーバイ','チヌ','タマン','グルクン'] } },
+    { id:'nago',            lat:26.593, lng:127.969, name:'名護漁港',         pref:'沖縄県',
+      baseFish:{ spring:['タマン','ミーバイ','グルクン','チヌ'], summer:['ガーラ','シイラ','カーエー','タマン'], autumn:['タマン','ガーラ','グルクン','ミーバイ'], winter:['ミーバイ','タマン','チヌ','グルクン'] } },
+    { id:'ishigaki_shinko', lat:24.340, lng:124.155, name:'石垣港新港地区',   pref:'沖縄県（石垣島）',
+      baseFish:{ spring:['ガーラ','タマン','ミーバイ','グルクン'], summer:['シイラ','カーエー','ガーラ','タマン'], autumn:['ガーラ','タマン','グルクン','カーエー'], winter:['ミーバイ','タマン','チヌ','グルクン'] } },
+    // === 浜・サーフ（5箇所）===
+    { id:'kujukuri',      lat:35.485, lng:140.465, name:'九十九里浜',                 pref:'千葉県',   type:'beach',
+      baseFish:{ spring:['キス','ヒラメ','イシモチ','マゴチ'], summer:['キス','イシモチ','マゴチ','ヒラメ'], autumn:['ヒラメ','マゴチ','シーバス','キス'], winter:['ヒラメ','カレイ','シーバス','イシモチ'] } },
+    { id:'kugenuma',      lat:35.315, lng:139.477, name:'鵠沼海岸（湘南サーフ）',     pref:'神奈川県', type:'beach',
+      baseFish:{ spring:['キス','マゴチ','ヒラメ','シーバス'], summer:['キス','イシモチ','マゴチ','ヒラメ'], autumn:['ヒラメ','マゴチ','シーバス','キス'], winter:['ヒラメ','カレイ','シーバス','マゴチ'] } },
+    { id:'chirihama',     lat:36.756, lng:136.620, name:'千里浜なぎさドライブウェイ', pref:'石川県',   type:'beach',
+      baseFish:{ spring:['キス','マゴチ','ヒラメ','アジ'], summer:['キス','イシモチ','シーバス','マゴチ'], autumn:['ヒラメ','マゴチ','キス','シーバス'], winter:['カレイ','ヒラメ','マゴチ','シーバス'] } },
+    { id:'enshunada',     lat:34.700, lng:137.700, name:'遠州灘サーフ（浜松）',       pref:'静岡県',   type:'beach',
+      baseFish:{ spring:['キス','マゴチ','ヒラメ','シーバス'], summer:['キス','シーバス','マゴチ','ヒラメ'], autumn:['ヒラメ','マゴチ','シーバス','キス'], winter:['ヒラメ','カレイ','マゴチ','シーバス'] } },
+    { id:'hamada_beach',  lat:33.595, lng:130.270, name:'浜田海岸（今宿・福岡）',     pref:'福岡県',   type:'beach',
+      baseFish:{ spring:['キス','マゴチ','ヒラメ','シーバス'], summer:['キス','マゴチ','シーバス','ヒラメ'], autumn:['ヒラメ','マゴチ','シーバス','キス'], winter:['ヒラメ','カレイ','シーバス','マゴチ'] } },
+    // === 岬・磯場（5箇所）===
+    { id:'jogashima',     lat:35.128, lng:139.609, name:'城ヶ島（三浦半島）',         pref:'神奈川県', type:'cape',
+      baseFish:{ spring:['メジナ','クロダイ','カサゴ','アジ'], summer:['イサキ','メジナ','クロダイ','ハマチ'], autumn:['カンパチ','ヒラマサ','メジナ','クロダイ'], winter:['メジナ','クロダイ','カサゴ','アイナメ'] } },
+    { id:'omaezaki_cape', lat:34.600, lng:138.216, name:'御前崎磯場',                 pref:'静岡県',   type:'cape',
+      baseFish:{ spring:['メジナ','クロダイ','イサキ','カサゴ'], summer:['カツオ','ブリ','イサキ','メジナ'], autumn:['ブリ','カンパチ','ヒラマサ','メジナ'], winter:['メジナ','イシダイ','クロダイ','カサゴ'] } },
+    { id:'shionomisaki',  lat:33.437, lng:135.770, name:'潮岬磯場',                   pref:'和歌山県', type:'cape',
+      baseFish:{ spring:['メジナ','クロダイ','イサキ','マダイ'], summer:['カツオ','ブリ','イサキ','シイラ'], autumn:['ヒラマサ','カンパチ','ブリ','メジナ'], winter:['メジナ','イシダイ','クロダイ','グレ'] } },
+    { id:'muroto_cape',   lat:33.258, lng:134.178, name:'室戸岬磯場',                 pref:'高知県',   type:'cape',
+      baseFish:{ spring:['メジナ','クロダイ','イサキ','マダイ'], summer:['カツオ','シイラ','イサキ','ブリ'], autumn:['カンパチ','ヒラマサ','ブリ','メジナ'], winter:['メジナ','グレ','イシダイ','クロダイ'] } },
+    { id:'toi_cape',      lat:31.351, lng:131.118, name:'都井岬磯場',                 pref:'宮崎県',   type:'cape',
+      baseFish:{ spring:['メジナ','クロダイ','イサキ','マダイ'], summer:['カツオ','カンパチ','ブリ','イサキ'], autumn:['ヒラマサ','カンパチ','ブリ','メジナ'], winter:['メジナ','グレ','イシダイ','クロダイ'] } },
+];
+
+// 現在のシーズンを返す
+function _getSeasonKey() {
+    const m = new Date().getMonth() + 1;
+    if (m >= 3 && m <= 5) return 'spring';
+    if (m >= 6 && m <= 8) return 'summer';
+    if (m >= 9 && m <= 11) return 'autumn';
+    return 'winter';
+}
+
+// 気象条件 + シーズンから活性魚種を選定
+const _WARM_FISH  = new Set(['アジ','シーバス','タチウオ','ハマチ','チヌ','タコ','イワシ','サバ','カマス','イナダ','マダイ','イサキ','カツオ','ワカシ']);
+const _COLD_FISH  = new Set(['カレイ','アイナメ','メバル','ガシラ','タラ','マコガレイ']);
+const _BEACH_FISH = new Set(['キス','マゴチ','ヒラメ','シーバス']);
+const _CAPE_FISH  = new Set(['メジナ','グレ','クロダイ','チヌ','イシダイ','ブリ','カンパチ','ヒラマサ']);
+const _PORT_FISH  = new Set(['アジ','イワシ','メバル','タチウオ','アオリイカ']);
+function _selectActiveFish(port, conditions) {
+    const season = _getSeasonKey();
+    const candidates = port.baseFish[season];
+    if (!conditions) return { active: candidates.slice(0, 3), source: 'fallback', season };
+
+    const { sst, windSpeed } = conditions;
+    const type = port.type ?? 'port';
+    const scored = candidates.map(fish => {
+        let score = 1;
+        if (sst !== null) {
+            if (sst > 22 && _WARM_FISH.has(fish))              score += 2;
+            else if (sst >= 15 && !_COLD_FISH.has(fish))       score += 1;
+            else if (sst < 15 && _COLD_FISH.has(fish))         score += 2;
+        }
+        if (windSpeed !== null && windSpeed < 3 &&
+            ['アジ','シーバス','タチウオ'].includes(fish))      score += 1;
+        if      (type === 'beach' && _BEACH_FISH.has(fish))    score += 1;
+        else if (type === 'cape'  && _CAPE_FISH.has(fish))     score += 1;
+        else if (type === 'port'  && _PORT_FISH.has(fish))     score += 1;
+        return { fish, score };
+    });
+    scored.sort((a, b) => b.score - a.score);
+    return { active: scored.slice(0, 3).map(x => x.fish), source: 'realtime', season };
+}
+
+function _typeEmoji(type) {
+    if (type === 'beach') return '🏖️';
+    if (type === 'cape')  return '⛰️';
+    return '⚓';
+}
+
+// tooltip テキスト生成
+function _buildTooltip(port, conditions) {
+    const { active, source } = _selectActiveFish(port, conditions);
+    const prefix = source === 'realtime' ? '' : '（※予測）';
+    return `${_typeEmoji(port.type)} ${port.name} | ${prefix}${active.join('・')}`;
+}
+
+// popup HTML 生成
+function _buildPopup(port, conditions) {
+    const { active, source, season } = _selectActiveFish(port, conditions);
+    const prefix = source === 'realtime' ? '' : '（※予測）';
+    const seasonFish = port.baseFish[season];
+
+    let condHtml;
+    if (conditions && source === 'realtime') {
+        const sst     = conditions.sst        != null ? `${conditions.sst.toFixed(1)}℃`       : '—';
+        const wind    = conditions.windSpeed   != null ? `${conditions.windSpeed.toFixed(1)} m/s` : '—';
+        const wave    = conditions.waveHeight  != null ? `${conditions.waveHeight.toFixed(1)} m`  : '—';
+        const airTemp = conditions.airTemp     != null ? `${conditions.airTemp.toFixed(1)}℃`    : '—';
+        condHtml = `<div style="background:#f0f7ff;border-radius:8px;padding:8px;margin-bottom:8px;font-size:12px;">
+            <div style="font-weight:700;color:#1565c0;margin-bottom:4px;">🌡️ 現在の海況</div>
+            <div>🌊 海水温：${sst} &nbsp;💨 風速：${wind}</div>
+            <div>🏄 波高：${wave} &nbsp;🌡️ 気温：${airTemp}</div>
+        </div>`;
+    } else {
+        condHtml = `<div style="background:#fff8e1;border-radius:8px;padding:6px;margin-bottom:8px;font-size:11px;color:#b45309;">
+            ⚠️ 海況データ取得失敗 — シーズン予測で表示中</div>`;
+    }
+
+    return `<div style="font-family:sans-serif;min-width:210px;line-height:1.7;">
+        <div style="font-weight:800;font-size:14px;color:#1a73e8;margin-bottom:8px;border-bottom:1px solid #e0e0e0;padding-bottom:6px;">
+            ${_typeEmoji(port.type)} ${port.name}
+            <span style="font-size:11px;color:#999;font-weight:400;">（${port.pref}）</span>
+        </div>
+        ${condHtml}
+        <div style="margin-bottom:8px;">
+            <div style="font-size:11px;font-weight:700;color:#555;margin-bottom:2px;">🎣 今日の狙い目魚種</div>
+            <div style="font-size:13px;font-weight:800;color:#222;">${prefix}${active.join('・')}</div>
+        </div>
+        <div>
+            <div style="font-size:11px;font-weight:700;color:#999;margin-bottom:2px;">📅 ${SEASON_LABELS[season]}のシーズン魚種</div>
+            <div style="font-size:11px;color:#555;">${seasonFish.join('・')}</div>
+        </div>
+    </div>`;
+}
+
+// マーカーの tooltip / popup を更新
+function _updateMarker(port) {
+    const marker = guideMarkers[port.id];
+    if (!marker) return;
+    const conditions = portWeatherCache[port.id]?.data ?? null;
+    marker.setTooltipContent(_buildTooltip(port, conditions));
+    marker.setPopupContent(_buildPopup(port, conditions));
+}
+
+// マーカーを全再生成（初期または再描画時）
+function renderGuidePins() {
+    if (!guidePortLayer) guidePortLayer = L.layerGroup();
+    else guidePortLayer.clearLayers();
+    guideMarkers = {};
+
+    GUIDE_PORTS.forEach(port => {
+        const type = port.type ?? 'port';
+        const [bg, border] = type === 'beach' ? ['#fffde7', '#f9a825']
+                           : type === 'cape'  ? ['#e8f5e9', '#2e7d32']
+                           :                    ['#fff8e1', '#f59e0b'];
+        const icon = L.divIcon({
+            className: '',
+            html: `<div style="background:${bg};border:2px solid ${border};border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:13px;box-shadow:0 2px 6px rgba(0,0,0,0.2);">${_typeEmoji(type)}</div>`,
+            iconAnchor: [11, 11]
+        });
+        const conditions = portWeatherCache[port.id]?.data ?? null;
+        const marker = L.marker([port.lat, port.lng], { icon });
+        marker.bindTooltip(_buildTooltip(port, conditions), {
+            permanent: true, direction: 'bottom',
+            className: 'guide-tooltip', offset: [0, 6]
+        });
+        marker.bindPopup(_buildPopup(port, conditions));
+        guidePortLayer.addLayer(marker);
+        guideMarkers[port.id] = marker;
+    });
+}
+
+// Open-Meteo API から海況を取得し marker を更新
+// Marine API (海水温・波): https://marine-api.open-meteo.com — CORS フリー・HTTPS
+// Weather API (風速・気温): https://api.open-meteo.com      — CORS フリー・HTTPS
+async function fetchAndUpdateGuidePins() {
+    if (guideFetchInProgress) return;
+    guideFetchInProgress = true;
+    const now = Date.now();
+
+    // 現在画面内に映っている港だけを対象にしてAPIコールを最小化
+    const bounds = map.getBounds();
+    const visiblePorts = GUIDE_PORTS.filter(p => bounds.contains(L.latLng(p.lat, p.lng)));
+
+    await Promise.allSettled(visiblePorts.map(async port => {
+        // キャッシュが有効なら再取得しない
+        if (portWeatherCache[port.id] && now - portWeatherCache[port.id].timestamp < GUIDE_CACHE_TTL) {
+            _updateMarker(port);
+            return;
+        }
+        try {
+            const [mRes, wRes] = await Promise.all([
+                fetch(`https://marine-api.open-meteo.com/v1/marine?latitude=${port.lat}&longitude=${port.lng}&current=sea_surface_temperature,wave_height&timezone=Asia%2FTokyo`),
+                fetch(`https://api.open-meteo.com/v1/forecast?latitude=${port.lat}&longitude=${port.lng}&current=wind_speed_10m,temperature_2m&timezone=Asia%2FTokyo`)
+            ]);
+            const [mData, wData] = await Promise.all([mRes.json(), wRes.json()]);
+            portWeatherCache[port.id] = {
+                data: {
+                    sst:        mData.current?.sea_surface_temperature ?? null,
+                    waveHeight: mData.current?.wave_height             ?? null,
+                    windSpeed:  wData.current?.wind_speed_10m          ?? null,
+                    airTemp:    wData.current?.temperature_2m          ?? null,
+                },
+                timestamp: now
+            };
+        } catch (e) {
+            console.warn(`[GuidePins] 海況取得失敗 (${port.name}):`, e.message);
+            // フォールバック: data=null としてシーズン予測を使用
+            portWeatherCache[port.id] = { data: null, timestamp: now };
+        }
+        _updateMarker(port);
+    }));
+
+    guideFetchInProgress = false;
+}
+
+// ズームレベル変化時のピン表示制御
+function updateGuidePinsVisibility() {
+    if (!map || !guidePortLayer) return;
+    if (map.getZoom() >= GUIDE_ZOOM_THRESHOLD) {
+        if (!map.hasLayer(guidePortLayer)) {
+            map.addLayer(guidePortLayer);
+            fetchAndUpdateGuidePins(); // 表示時に非同期でリアルタイムデータ取得
+        }
+    } else {
+        if (map.hasLayer(guidePortLayer)) map.removeLayer(guidePortLayer);
+    }
 }
 
 // ===== Timeline Render =====
@@ -1012,7 +1753,7 @@ function renderTimeline() {
                 <button class="action-btn" onclick="showOnMap(${post.lat}, ${post.lng})">
                     🗺️ 地図で見る
                 </button>
-                ${post.isMyPost ? `<button class="action-btn" onclick="startEditPost(${post.id},'timeline')" style="color:#1a73e8; font-weight:700;">✏️ 編集</button>` : ''}
+                ${post.isMyPost ? `<button class="action-btn" onclick="startEditPost(${post.id},'timeline')" style="color:#1a73e8; font-weight:700;">✏️ 編集</button><button class="action-btn" onclick="showDeleteConfirm(${post.id})" style="color:#ef4444; font-weight:700;">🗑️ 削除</button>` : ''}
             </div>
         </div>
     `).join('');
@@ -1054,9 +1795,9 @@ function placeMyPin(lat, lng) {
         iconAnchor: [20, 20]
     });
     myMarker = L.marker([lat, lng], { icon }).addTo(map);
-    myMarker.bindPopup(`<b>あなたのチェックイン地点</b><br>📅 ${todayDateStr}<br>☀️ 晴れ 23℃ / 🌊 中潮 / 💨 南西 3m/s`).openPopup();
+    myMarker.bindPopup(`<b>あなたのチェックイン地点</b><br>📅 ${todayDateStr}<br>${todayWeather.weather.icon} ${todayWeather.weather.label} ${todayWeather.temp}℃ / 🌊 ${todayWeather.tide} / 💨 ${todayWeather.windDir} ${todayWeather.windSpeed}m/s`).openPopup();
     map.setView([lat, lng], 13);
-    showToast(`✅ チェックイン完了！ 📅 ${todayDateStr} ☀️ 晴れ 🌊 中潮`);
+    showToast(`✅ チェックイン完了！ 📅 ${todayDateStr} ${todayWeather.weather.icon} ${todayWeather.weather.label} 🌊 ${todayWeather.tide}`);
 }
 
 function selectPrivacy(btn, val) {
@@ -1144,6 +1885,7 @@ async function submitPost() {
     } else {
         const newPost = {
             id: Date.now(),
+            accountId: currentSession ? currentSession.id : undefined,
             user: myProfile.name, emoji: myProfile.emoji,
             fish, size: null, lure: null,
             location,
@@ -1168,6 +1910,32 @@ async function submitPost() {
 }
 
 
+
+// ===== Delete Post =====
+let pendingDeleteId = null;
+
+function showDeleteConfirm(id) {
+    pendingDeleteId = id;
+    document.getElementById('delete-confirm-modal').style.display = 'flex';
+}
+
+function closeDeleteConfirm() {
+    document.getElementById('delete-confirm-modal').style.display = 'none';
+    pendingDeleteId = null;
+}
+
+function executeDelete() {
+    if (pendingDeleteId === null) return;
+    posts = posts.filter(p => p.id !== pendingDeleteId);
+    savePosts();
+    renderMapPins();
+    renderTimeline();
+    renderMyPosts();
+    updateStats();
+    renderPrefList();
+    closeDeleteConfirm();
+    showToast('🗑️ 投稿を削除しました');
+}
 
 // ===== Post Edit =====
 let editingPostId = null;
@@ -1253,7 +2021,7 @@ function switchTab(tab) {
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
     document.getElementById('panel-' + tab).classList.add('active');
     document.getElementById('nav-' + tab).classList.add('active');
-    if (tab === 'map') setTimeout(() => map.invalidateSize(), 100);
+    if (tab === 'map') { applyWeatherCard(); setTimeout(() => map.invalidateSize(), 100); }
 }
 
 // ===== Groups =====
@@ -1439,6 +2207,14 @@ function saveProfile() {
     myProfile = { name, emoji: selectedAvatarEmoji, photo: newPhoto };
     localStorage.setItem('fishinglog_profile', JSON.stringify(myProfile));
 
+    // セッション・アカウントレコードも更新
+    if (currentSession) {
+        currentSession.name = name; currentSession.emoji = selectedAvatarEmoji; currentSession.photo = newPhoto;
+        localStorage.setItem('fishinglog_session', JSON.stringify(currentSession));
+        const acc = accounts.find(a => a.id === currentSession.id);
+        if (acc) { acc.name = name; acc.emoji = selectedAvatarEmoji; acc.photo = newPhoto; _saveAccounts(); }
+    }
+
     // 既存の自分の投稿を一括更新
     posts.forEach(p => {
         if (p.isMyPost) { p.user = name; p.emoji = selectedAvatarEmoji; }
@@ -1608,12 +2384,18 @@ let selectedPhotos = [];
 function handlePhotoSelect(input) {
     const files = Array.from(input.files);
     if (!files.length) return;
+    const isFirstPhoto = selectedPhotos.length === 0;
+    let aiTriggered = false;
     files.forEach(file => {
         if (selectedPhotos.length >= 9) return;
         const reader = new FileReader();
         reader.onload = (e) => {
             selectedPhotos.push({ src: e.target.result });
             renderPhotoGrid();
+            if (isFirstPhoto && !aiTriggered) {
+                aiTriggered = true;
+                identifyFishFromPhoto();
+            }
         };
         reader.readAsDataURL(file);
     });
@@ -1641,73 +2423,114 @@ function removePhoto(index) {
 async function identifyFishFromPhoto() {
     const apiKey = localStorage.getItem('gemini_api_key');
     if (!apiKey) { showApiKeyModal(); return; }
+    if (!selectedPhotos.length) return;
 
-    const btn = document.getElementById('ai-identify-btn');
-    btn.disabled = true;
-    btn.textContent = '🔍 判定中...';
+    const fishList = document.getElementById('fish-entry-list');
+    fishList.innerHTML = `<div class="ai-loading-row"><span class="ai-loading-spinner"></span>🔍 AIが魚種を判定中...</div>`;
+    const submitBtn = document.getElementById('post-submit-btn');
+    submitBtn.disabled = true;
+
+    const prompt = `添付された写真は釣り人が撮影した釣果写真です。プロのアングラーおよび魚類学者として、写真に写っている主要な魚の特定を行ってください。
+魚が斜めを向いていたり、手で持たれていたり、夜間で画質が荒くても、ヒレの形・体の模様・全体のシルエットなどの特徴から最も可能性の高い日本の一般的な魚種名を推測してください。
+必ず以下のJSONフォーマットの文字列のみを返してください。前後の挨拶や解説、マークダウン記号などは一切不要です：
+{"fish":"最も可能性の高い一般的な魚種名（例：マダイ、シーバス、アジ、サバ、ブラックバスなど）","size":"写真から推測される大体のサイズ（例：約30cm、40〜50cmなど。分からない場合は不明）","confidence":"高/中/低","feature":"特定に至った外見的な特徴（20文字以内）"}`;
 
     try {
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+        const dataUrl = selectedPhotos[0].src;
+        const [header, base64data] = dataUrl.split(',');
+        const mimeType = header.match(/:(.*?);/)[1];
+
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                contents: [{
-                    parts: [
-                        { inline_data: { mime_type: selectedPhotoMime, data: selectedPhotoBase64 } },
-                        { text: '写真の魚を特定してください。必ずJSON形式のみで回答（余分なテキスト不要）：{"fish":"魚種名（日本語）","size":"推定サイズ（例：30〜40cm）","confidence":"高/中/低","feature":"特徴（20字以内）"}' }
-                    ]
-                }]
+                contents: [{ parts: [
+                    { inline_data: { mime_type: mimeType, data: base64data } },
+                    { text: prompt }
+                ]}]
             })
         });
 
         if (!res.ok) {
-            const err = await res.json();
-            if (res.status === 400 || res.status === 401 || res.status === 403) {
+            const err = await res.json().catch(() => ({}));
+            if (res.status === 401 || res.status === 403) {
                 localStorage.removeItem('gemini_api_key');
-                btn.disabled = false;
-                btn.textContent = '🤖 AI魚判定する';
+                resetFishEntryToDefault();
+                submitBtn.disabled = false;
+                showToast('⚠️ APIキーが無効または期限切れです。再設定してください');
                 showApiKeyModal();
                 return;
             }
-            throw new Error(err.error?.message || 'APIエラー');
+            if (res.status === 429) {
+                throw new Error('APIの利用上限に達しました。しばらく待ってから再試行してください');
+            }
+            throw new Error(err.error?.message || `通信エラー（ステータス: ${res.status}）`);
         }
 
         const data = await res.json();
-        const match = data.candidates[0].content.parts[0].text.match(/\{[\s\S]*\}/);
-        if (!match) throw new Error('レスポンス解析エラー');
-        aiResultData = JSON.parse(match[0]);
 
-        document.getElementById('ai-fish-name').textContent = `🐟 ${aiResultData.fish}（信頼度: ${aiResultData.confidence}）`;
-        document.getElementById('ai-fish-detail').textContent = `📏 ${aiResultData.size} ／ ${aiResultData.feature}`;
-        document.getElementById('ai-result-card').style.display = 'flex';
+        // セーフティフィルターによるブロック検出
+        const candidate = data.candidates?.[0];
+        if (!candidate || candidate.finishReason === 'SAFETY') {
+            throw new Error('安全フィルターにより判定できませんでした。別の写真をお試しください');
+        }
+
+        const rawText = candidate.content?.parts?.[0]?.text || '';
+        const result = parseAiResponse(rawText);
+
+        if (result.confidence === '低') {
+            resetFishEntryToDefault();
+            showToast('⚠️ AIが判定できませんでした。魚種を手動で入力してください');
+        } else {
+            fishList.innerHTML = `<div class="fish-entry"><input class="form-input" type="text" value="${result.fish.replace(/"/g, '&quot;')}" autocomplete="off" /></div>`;
+            const badge = result.confidence === '高' ? '（確度：高）' : result.confidence === '中' ? '（確度：中）' : '';
+            showToast(`✅ AIが「${result.fish}」と判定しました${badge}`);
+        }
 
     } catch (e) {
-        showToast('⚠️ ' + e.message);
         console.error('AI判定エラー:', e);
+        resetFishEntryToDefault();
+        showToast(`⚠️ ${e.message || 'AI判定に失敗しました。魚種を手動で入力してください'}`);
     }
 
-    btn.disabled = false;
-    btn.textContent = '🤖 AI魚判定する';
+    submitBtn.disabled = false;
 }
 
-function applyAiResult() {
-    if (!aiResultData) return;
-    const select = document.getElementById('fish-type');
-    const fishName = aiResultData.fish;
-    let matched = false;
-    for (let opt of select.options) {
-        if (opt.value === fishName || fishName.includes(opt.value) || opt.value.includes(fishName)) {
-            select.value = opt.value;
-            matched = true;
-            break;
+// AIレスポンスのパース（コードブロック・壊れたJSONに対応）
+function parseAiResponse(text) {
+    const t = text.trim();
+
+    // コードブロック（```json...``` / ```...```）を除去してからJSONを探す
+    const unwrapped = t.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '');
+    const jsonMatch = unwrapped.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+        try {
+            const parsed = JSON.parse(jsonMatch[0]);
+            if (parsed.fish) return parsed;
+        } catch (_) { /* fallthrough */ }
+    }
+
+    // JSONが取れなくてもテキスト内の魚名を拾う
+    const KNOWN_FISH = [
+        'マダイ','シーバス','スズキ','アジ','サバ','ブラックバス','バス',
+        'ヒラメ','カサゴ','マゴチ','サーモン','ハマチ','ブリ','カツオ',
+        'メバル','カワハギ','クロダイ','チヌ','タチウオ','キス','カレイ',
+        'ワカサギ','イワナ','ヤマメ','アユ','ニジマス','コイ','フナ',
+        'ウナギ','アナゴ','タコ','イカ','アオリイカ','コウイカ',
+    ];
+    for (const fish of KNOWN_FISH) {
+        if (t.includes(fish)) {
+            return { fish, confidence: '中', size: '不明', feature: 'AI推定' };
         }
     }
-    if (!matched) {
-        const opt = new Option(fishName, fishName);
-        select.add(opt);
-        select.value = fishName;
-    }
-    showToast(`✅ 魚種を「${fishName}」に設定しました`);
+
+    // 最終フォールバック
+    return { fish: 'その他（要手動入力）', confidence: '低', size: '不明', feature: '' };
+}
+
+function resetFishEntryToDefault() {
+    document.getElementById('fish-entry-list').innerHTML =
+        '<div class="fish-entry"><input class="form-input" type="text" placeholder="例: シーバス" autocomplete="off" /></div>';
 }
 
 // ===== API Key Modal =====
@@ -1725,7 +2548,7 @@ function saveApiKey() {
     if (!key) { showToast('⚠️ APIキーを入力してください'); return; }
     localStorage.setItem('gemini_api_key', key);
     closeApiKeyModal();
-    if (selectedPhotoBase64) identifyFishFromPhoto();
+    if (selectedPhotos.length > 0) identifyFishFromPhoto();
 }
 
 // ===== Toast =====
