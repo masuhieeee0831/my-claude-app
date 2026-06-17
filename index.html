@@ -1771,7 +1771,16 @@ async function submitPost() {
     const fish = getFishList();
     const location = document.getElementById('location-input').value.trim();
 
-    if (!fish.length) { showToast('⚠️ 魚種を入力してください'); return; }
+    if (!fish.length) {
+        showToast('⚠️ 魚種を入力してください');
+        const firstInput = document.querySelector('#fish-entry-list input');
+        if (firstInput) {
+            firstInput.focus();
+            firstInput.style.borderColor = '#ef4444';
+            setTimeout(() => { firstInput.style.borderColor = ''; }, 2000);
+        }
+        return;
+    }
     if (!location) { showToast('⚠️ 釣り場を入力してください'); return; }
 
     const photos = [...selectedPhotos];
