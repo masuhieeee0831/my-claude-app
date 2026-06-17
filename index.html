@@ -492,34 +492,6 @@
             border-radius: 8px; font-size: 13px; font-weight: 700;
             cursor: pointer; font-family: inherit;
         }
-        .api-key-modal {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.55);
-            display: flex; align-items: center; justify-content: center;
-            z-index: 9998; padding: 20px;
-        }
-        .api-key-dialog {
-            background: white; border-radius: 18px; padding: 24px;
-            width: 100%; max-width: 380px;
-            display: flex; flex-direction: column; gap: 14px;
-            box-shadow: 0 8px 40px rgba(0,0,0,0.25);
-        }
-        .api-key-dialog h3 { font-size: 17px; font-weight: 800; color: #222; }
-        .api-key-dialog p { font-size: 13px; color: #666; line-height: 1.6; }
-        .api-key-input {
-            width: 100%; padding: 12px 14px; border: 1.5px solid #e0e0e0;
-            border-radius: 10px; font-size: 13px; font-family: monospace; outline: none;
-        }
-        .api-key-input:focus { border-color: #6a1b9a; }
-        .api-key-save-btn {
-            padding: 12px; background: linear-gradient(135deg, #6a1b9a, #ab47bc);
-            color: white; border: none; border-radius: 10px;
-            font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit;
-        }
-        .api-key-cancel-btn {
-            padding: 10px; background: none; color: #999; border: none;
-            font-size: 13px; cursor: pointer; font-family: inherit;
-        }
-
         /* ===== PROFILE EDIT ===== */
         .profile-edit-btn {
             margin-top: 14px;
@@ -645,21 +617,6 @@
         }
         .account-delete-btn:hover { background: #b91c1c; }
 
-        /* ===== AI LOADING ===== */
-        @keyframes ai-spin { to { transform: rotate(360deg); } }
-        .ai-loading-spinner {
-            display: inline-block; width: 15px; height: 15px;
-            border: 2px solid #e8f0fe; border-top-color: #1a73e8;
-            border-radius: 50%; animation: ai-spin 0.75s linear infinite;
-            flex-shrink: 0;
-        }
-        .ai-loading-row {
-            display: flex; align-items: center; gap: 8px;
-            padding: 11px 14px; color: #1a73e8;
-            font-size: 14px; font-weight: 600;
-            background: #f0f7ff; border-radius: 10px;
-            border: 1.5px solid #90caf9;
-        }
 
         /* ===== GUIDE PIN TOOLTIP ===== */
         .guide-tooltip {
@@ -953,16 +910,6 @@
         <p>本当にこの釣果投稿を削除しますか？<br>この操作は取り消せません。</p>
         <button class="modal-btn-danger" onclick="executeDelete()">削除する</button>
         <button class="modal-btn-cancel" onclick="closeDeleteConfirm()">キャンセル</button>
-    </div>
-</div>
-
-<div class="api-key-modal" id="api-key-modal" style="display:none">
-    <div class="api-key-dialog">
-        <h3>🔑 Gemini APIキーを設定</h3>
-        <p>AI魚判定機能にはGoogle Gemini APIキーが必要です（<b>無料</b>）。<br><a href="https://aistudio.google.com/apikey" target="_blank" style="color:#6a1b9a">aistudio.google.com</a> で取得できます。キーはこのデバイスにのみ保存されます。</p>
-        <input type="password" class="api-key-input" id="api-key-input" placeholder="AIzaSy..." />
-        <button class="api-key-save-btn" onclick="saveApiKey()">保存して判定する</button>
-        <button class="api-key-cancel-btn" onclick="closeApiKeyModal()">キャンセル</button>
     </div>
 </div>
 
@@ -2378,24 +2325,17 @@ function resizeImage(dataUrl, maxPx) {
     });
 }
 
-// ===== AI Fish Identification =====
 let selectedPhotos = [];
 
 function handlePhotoSelect(input) {
     const files = Array.from(input.files);
     if (!files.length) return;
-    const isFirstPhoto = selectedPhotos.length === 0;
-    let aiTriggered = false;
     files.forEach(file => {
         if (selectedPhotos.length >= 9) return;
         const reader = new FileReader();
         reader.onload = (e) => {
             selectedPhotos.push({ src: e.target.result });
             renderPhotoGrid();
-            if (isFirstPhoto && !aiTriggered) {
-                aiTriggered = true;
-                identifyFishFromPhoto();
-            }
         };
         reader.readAsDataURL(file);
     });
@@ -2418,137 +2358,6 @@ function renderPhotoGrid() {
 function removePhoto(index) {
     selectedPhotos.splice(index, 1);
     renderPhotoGrid();
-}
-
-async function identifyFishFromPhoto() {
-    const apiKey = localStorage.getItem('gemini_api_key');
-    if (!apiKey) { showApiKeyModal(); return; }
-    if (!selectedPhotos.length) return;
-
-    const fishList = document.getElementById('fish-entry-list');
-    fishList.innerHTML = `<div class="ai-loading-row"><span class="ai-loading-spinner"></span>🔍 AIが魚種を判定中...</div>`;
-    const submitBtn = document.getElementById('post-submit-btn');
-    submitBtn.disabled = true;
-
-    const prompt = `添付された写真は釣り人が撮影した釣果写真です。プロのアングラーおよび魚類学者として、写真に写っている主要な魚の特定を行ってください。
-魚が斜めを向いていたり、手で持たれていたり、夜間で画質が荒くても、ヒレの形・体の模様・全体のシルエットなどの特徴から最も可能性の高い日本の一般的な魚種名を推測してください。
-必ず以下のJSONフォーマットの文字列のみを返してください。前後の挨拶や解説、マークダウン記号などは一切不要です：
-{"fish":"最も可能性の高い一般的な魚種名（例：マダイ、シーバス、アジ、サバ、ブラックバスなど）","size":"写真から推測される大体のサイズ（例：約30cm、40〜50cmなど。分からない場合は不明）","confidence":"高/中/低","feature":"特定に至った外見的な特徴（20文字以内）"}`;
-
-    try {
-        const dataUrl = selectedPhotos[0].src;
-        const [header, base64data] = dataUrl.split(',');
-        const mimeType = header.match(/:(.*?);/)[1];
-
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ parts: [
-                    { inline_data: { mime_type: mimeType, data: base64data } },
-                    { text: prompt }
-                ]}]
-            })
-        });
-
-        if (!res.ok) {
-            const err = await res.json().catch(() => ({}));
-            if (res.status === 401 || res.status === 403) {
-                localStorage.removeItem('gemini_api_key');
-                resetFishEntryToDefault();
-                submitBtn.disabled = false;
-                showToast('⚠️ APIキーが無効または期限切れです。再設定してください');
-                showApiKeyModal();
-                return;
-            }
-            if (res.status === 429) {
-                throw new Error('APIの利用上限に達しました。しばらく待ってから再試行してください');
-            }
-            throw new Error(err.error?.message || `通信エラー（ステータス: ${res.status}）`);
-        }
-
-        const data = await res.json();
-
-        // セーフティフィルターによるブロック検出
-        const candidate = data.candidates?.[0];
-        if (!candidate || candidate.finishReason === 'SAFETY') {
-            throw new Error('安全フィルターにより判定できませんでした。別の写真をお試しください');
-        }
-
-        const rawText = candidate.content?.parts?.[0]?.text || '';
-        const result = parseAiResponse(rawText);
-
-        if (result.confidence === '低') {
-            resetFishEntryToDefault();
-            showToast('⚠️ AIが判定できませんでした。魚種を手動で入力してください');
-        } else {
-            fishList.innerHTML = `<div class="fish-entry"><input class="form-input" type="text" value="${result.fish.replace(/"/g, '&quot;')}" autocomplete="off" /></div>`;
-            const badge = result.confidence === '高' ? '（確度：高）' : result.confidence === '中' ? '（確度：中）' : '';
-            showToast(`✅ AIが「${result.fish}」と判定しました${badge}`);
-        }
-
-    } catch (e) {
-        console.error('AI判定エラー:', e);
-        resetFishEntryToDefault();
-        showToast(`⚠️ ${e.message || 'AI判定に失敗しました。魚種を手動で入力してください'}`);
-    }
-
-    submitBtn.disabled = false;
-}
-
-// AIレスポンスのパース（コードブロック・壊れたJSONに対応）
-function parseAiResponse(text) {
-    const t = text.trim();
-
-    // コードブロック（```json...``` / ```...```）を除去してからJSONを探す
-    const unwrapped = t.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '');
-    const jsonMatch = unwrapped.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-        try {
-            const parsed = JSON.parse(jsonMatch[0]);
-            if (parsed.fish) return parsed;
-        } catch (_) { /* fallthrough */ }
-    }
-
-    // JSONが取れなくてもテキスト内の魚名を拾う
-    const KNOWN_FISH = [
-        'マダイ','シーバス','スズキ','アジ','サバ','ブラックバス','バス',
-        'ヒラメ','カサゴ','マゴチ','サーモン','ハマチ','ブリ','カツオ',
-        'メバル','カワハギ','クロダイ','チヌ','タチウオ','キス','カレイ',
-        'ワカサギ','イワナ','ヤマメ','アユ','ニジマス','コイ','フナ',
-        'ウナギ','アナゴ','タコ','イカ','アオリイカ','コウイカ',
-    ];
-    for (const fish of KNOWN_FISH) {
-        if (t.includes(fish)) {
-            return { fish, confidence: '中', size: '不明', feature: 'AI推定' };
-        }
-    }
-
-    // 最終フォールバック
-    return { fish: 'その他（要手動入力）', confidence: '低', size: '不明', feature: '' };
-}
-
-function resetFishEntryToDefault() {
-    document.getElementById('fish-entry-list').innerHTML =
-        '<div class="fish-entry"><input class="form-input" type="text" placeholder="例: シーバス" autocomplete="off" /></div>';
-}
-
-// ===== API Key Modal =====
-function showApiKeyModal() {
-    document.getElementById('api-key-modal').style.display = 'flex';
-    document.getElementById('api-key-input').value = localStorage.getItem('gemini_api_key') || '';
-}
-
-function closeApiKeyModal() {
-    document.getElementById('api-key-modal').style.display = 'none';
-}
-
-function saveApiKey() {
-    const key = document.getElementById('api-key-input').value.trim();
-    if (!key) { showToast('⚠️ APIキーを入力してください'); return; }
-    localStorage.setItem('gemini_api_key', key);
-    closeApiKeyModal();
-    if (selectedPhotos.length > 0) identifyFishFromPhoto();
 }
 
 // ===== Toast =====
